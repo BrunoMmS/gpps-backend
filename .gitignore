@@ -1,33 +1,55 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Entorno virtual
+venv/
+.env
+.env.*
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*.pyo
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Archivos de test y cobertura
+coverage/
+htmlcov/
+.tox/
+.pytest_cache/
+.cache/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# Configuración de editores
 .vscode/
+.idea/
+
+# Archivos de log
+*.log
+
+# Archivos de base de datos SQLite (si usás local)
+*.sqlite3
+*.db
+
+# Migraciones (opcional, si usás Alembic)
+alembic/versions/*.pyc
+alembic/versions/*.pyo
+
+# Distribuciones
+dist/
+build/
+*.egg-info/
+
+# Docker
+*.pid
+*.sock
+docker-compose.override.yml
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# PyInstaller
+*.spec
+
+# mypy, pylint
+.mypy_cache/
+.pylint.d/
+
+# Jupyter (por si usás notebooks para pruebas)
+.ipynb_checkpoints/
