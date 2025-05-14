@@ -5,7 +5,7 @@
 ## Activar el entorno virtual
 - venv/Scripts/activate 
 
-## Instalar fastapi y el entorno virtual:
+## Instalar fastapi:
 - pip install -r requirements.txt
 
 ## Levantar servidor
