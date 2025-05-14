@@ -61,6 +61,7 @@ def login(credentials: UserLogin):
         raise HTTPException(status_code=401, detail="Contraseña incorrecta")
 
     return {
+        "id": user["id"],
         "username": user["username"],
         "email": user["email"],
         "role": user["role"]
