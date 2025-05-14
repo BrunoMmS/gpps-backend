@@ -1,5 +1,3 @@
-
-
 from pydantic import BaseModel
 
 #from services.rol import Rol
