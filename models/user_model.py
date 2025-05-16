@@ -1,0 +1,13 @@
+# models/user.py
+from sqlalchemy import Column, Integer, String
+from db.db import BaseDBModel
+
+class UserModel(BaseDBModel):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, nullable=False)
+    lastname = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)
+    role = Column(String, nullable=False)
