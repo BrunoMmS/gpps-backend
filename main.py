@@ -2,7 +2,12 @@ from fastapi import FastAPI
 from routers.user_router import user_router
 from fastapi.middleware.cors import CORSMiddleware
 
+from db.db import BaseDBModel
+
+
 app = FastAPI()
+BaseDBModel.metadata.create_all(bind=BaseDBModel.engine)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
