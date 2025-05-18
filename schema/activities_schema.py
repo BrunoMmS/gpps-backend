@@ -3,3 +3,4 @@ class activities(BaseModel):
     name: str
     duration: int
     id: int
+    done: bool
