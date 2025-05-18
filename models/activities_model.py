@@ -11,5 +11,4 @@ class Activities(BaseDBModel):
     done = Column(Boolean, nullable=False)
     workplan_id = Column(Integer, ForeignKey("workplan.id"))
     workplan = relationship("WorkPlan", back_populates="activities")
-
-    
+    tasks = relationship("Task", back_populates="activity")
