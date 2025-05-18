@@ -8,3 +8,8 @@ class tasksService:
     
     def set_done(self, db: Session, task_id: int) -> bool:
         Task.done = True
+        return True
+    
+    def get_done(self, db: Session, task_id: int) -> bool:
+        task = self.tasks_dao.get_task(db, task_id)
+        return task.done if task else False
