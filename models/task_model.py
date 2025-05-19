@@ -8,6 +8,6 @@ class TaskModel(BaseDBModel):
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, nullable=False)
     done = Column(Boolean, nullable=False, default=False)
-    activity_id = Column(Integer, ForeignKey("activities.id"))
+    activity_id = Column(Integer, ForeignKey("Activity.id"))
     activity = relationship("Activities", back_populates="tasks")
     
