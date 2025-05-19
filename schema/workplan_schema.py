@@ -8,4 +8,3 @@ class WorkPlan(BaseModel):
 
 class WorkPlanCreate(BaseModel):
     description: str
-    activities: list[Activitie]
