@@ -1,12 +1,11 @@
 # modelo de Convenios
 from datetime import date
-
 from pydantic import BaseModel
 
 class Agreement(BaseModel):
     id: int
-    starDate: date
-    endDate: date
+    star_date: date
+    end_date: date
     current: bool #true --> convenio vigente
     projects: list[Project]
     #firm1: exEntity/student
