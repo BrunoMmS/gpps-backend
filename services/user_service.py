@@ -1,6 +1,6 @@
 # services/user_service.py
 from sqlalchemy.orm import Session
-from cruds.userDAO import UserDAO
+from cruds.UserDAO import UserDAO
 from schema.user_schema import UserCreate, UserLogin
 from models.user_model import UserModel
 

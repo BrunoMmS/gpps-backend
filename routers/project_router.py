@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from services.project_service import project_service
+from services.project_service import ProjectService
 from schema.project_schema import Project
 from db.db import SessionLocal
 
 project_router = APIRouter(prefix="/projects", tags=["projects"])
-project_service = project_service()
+project_service = ProjectService()
 
 def get_db():
     db = SessionLocal()
