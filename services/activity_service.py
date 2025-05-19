@@ -1,16 +1,16 @@
 from sqlalchemy.orm import Session
-from cruds.tasksDAO import tasksDAO
-from cruds.activitiesDAO import ActivitiesDAO
+from cruds.taskDAO import taskDAO
+from cruds.activityDAO import ActivityDAO
 from cruds.workplanDAO import WorkPlanDAO
 
-class activitiesService:
+class ActivityService:
     def __init__(self):
-        self.activities_dao = ActivitiesDAO()
+        self.activity_dao = ActivityDAO()
         self.workplan_dao = WorkPlanDAO()
-        self.tasks_dao = tasksDAO()
+        self.tasks_dao = taskDAO()
 
     def is_complete(self, db: Session, activity_id: int) -> bool:
-        activity = self.activities_dao.get_by_id(db, activity_id)
+        activity = self.activity_dao.get_by_id(db, activity_id)
         if not activity:
             return False
         tasks = self.tasks_dao.list_by_activity(db, activity_id)

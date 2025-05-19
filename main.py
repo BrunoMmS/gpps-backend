@@ -3,7 +3,7 @@ from routers.user_router import user_router
 from fastapi.middleware.cors import CORSMiddleware
 
 from db.db import BaseDBModel
-from routers.proyectoPPS_router import proyecto_router
+from routers.project_router import project_router
 
 
 app = FastAPI()
@@ -19,4 +19,4 @@ app.add_middleware(
 
 #Register the user router
 app.include_router(user_router)
-app.include_router(proyecto_router)
+app.include_router(project_router)

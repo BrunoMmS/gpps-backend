@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from db.db import BaseDBModel  
 
-class ProyectPPS(BaseDBModel):
+class ProjectModel(BaseDBModel):
     __tablename__ = "proyectos_pps"
 
     id = Column(Integer, primary_key=True, index=True)

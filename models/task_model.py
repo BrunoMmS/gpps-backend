@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from db.db import BaseDBModel 
 from sqlalchemy.orm import relationship
 
-class Task(BaseDBModel):
+class TaskModel(BaseDBModel):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -1,14 +1,17 @@
 from sqlalchemy.orm import Session
-from cruds.tasksDAO import tasksDAO
-from models.tasks_model import Task
+from cruds.taskDAO import TaskDAO
 
-class tasksService:
+class TaskService:
     def __init__(self):
-        self.tasks_dao = tasksDAO()
-    
+        self.tasks_dao = TaskDAO()
+
     def set_done(self, db: Session, task_id: int) -> bool:
-        Task.done = True
-        return True
+        task = self.tasks_dao.get_task(db, task_id)
+        if task:
+            task.done = True
+            db.commit()
+            return True
+        return False
     
     def get_done(self, db: Session, task_id: int) -> bool:
         task = self.tasks_dao.get_task(db, task_id)

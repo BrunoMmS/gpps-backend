@@ -1,8 +1,7 @@
 from enum import Enum
 
-
 class Rol(str, Enum):
-    user = "estudiante"
-    admin = "administrador"
-    teacher = "tutorUNRN"
-    teacher2 = "tutorExterno"
+    student = "Estudiante"
+    exEntity = "Entidad_Externa"
+    teacher = "Tutor_UNRN"
+    teacher2 = "Tutor_Externo"
