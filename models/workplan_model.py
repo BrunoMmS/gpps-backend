@@ -3,10 +3,10 @@ from sqlalchemy.orm import relationship
 from db.db import BaseDBModel 
 
 class WorkPlan(BaseDBModel):
-    __tablename__ = "workplan"
+    __tablename__ = "Plan_de_Trabajo"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    project = relationship("ProyectPPS", back_populates="workplan", uselist=False)
+    project = relationship("ProjectModel", back_populates="workplan", uselist=False)
 
-    activities = relationship("Activities", back_populates="workplan")
+    activities = relationship("ActivitieModel", back_populates="workplan")

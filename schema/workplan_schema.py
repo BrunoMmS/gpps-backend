@@ -1,5 +1,11 @@
 from pydantic import BaseModel
-from activities_schema import activities
-class work_plan(BaseModel):
-    activities=[activities]
-    id : int
+from schema.activity_schema import Activity
+
+class WorkPlan(BaseModel):
+    id: int
+    description: str
+    activities: list[Activity]
+
+class WorkPlanCreate(BaseModel):
+    description: str
+    activities: list[Activity]
