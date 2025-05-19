@@ -12,7 +12,7 @@ class ProjectModel(BaseDBModel):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=True)
 
-    workplan_id = Column(Integer, ForeignKey("workplan.id"))
+    workplan_id = Column(Integer, ForeignKey("Plan_de_Trabajo.id"))
     workplan = relationship("WorkPlan")
 
 
