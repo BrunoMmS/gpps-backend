@@ -7,7 +7,7 @@ class WorkPlanDAO:
         return db.query(WorkPlan).filter(WorkPlan.id == workplan_id).first()
 
     def create(self, db: Session, workplan_data: WorkPlanCreate) -> WorkPlan:
-        db_workplan = WorkPlan(**workplan_data.dict())
+        db_workplan = WorkPlan(**workplan_data.model_dump())
         db.add(db_workplan)
         db.commit()
         db.refresh(db_workplan)

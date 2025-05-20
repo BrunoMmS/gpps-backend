@@ -1,6 +1,7 @@
 from datetime import date
 from schema.workplan_schema import WorkPlan
 from pydantic import BaseModel
+from typing import Optional
 
 class Project(BaseModel):
     id: int
@@ -9,7 +10,11 @@ class Project(BaseModel):
     active: bool
     start_date: date
     end_date: date
-    workplan: WorkPlan 
+    workplan: Optional[WorkPlan] = None
 
-class ProjectCreate(Project):
-    pass
+class ProjectCreate(BaseModel):
+    title: str
+    description: str
+    active: bool
+    start_date: date
+    end_date: date

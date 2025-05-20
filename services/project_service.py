@@ -8,6 +8,7 @@ from schema.workplan_schema import WorkPlanCreate
 from schema.activity_schema import ActivitieCreate
 from schema.task_schema import Task
 from models.project_model import ProjectModel
+from services.workplan_service import WorkPlanService
 
 
 class ProjectService:
@@ -37,3 +38,10 @@ class ProjectService:
         project_data_dict = data.dict()
         project_data_dict["workplan_id"] = new_workplan.id
         return self.project_dao.create(db, ProjectCreate(**project_data_dict))
+
+    def create_project(self, db: Session, project_data: ProjectCreate) -> ProjectModel:
+        return self.project_dao.create(db, project_data)
+    
+    def add_workplan(self, db: Session,  workplan_data: WorkPlanCreate):
+        workplan_service = WorkPlanService()
+        return workplan_service.create_workplan(db,  workplan_data)

@@ -10,7 +10,7 @@ class ProjectDAO:
         return db.query(ProjectModel).all()
 
     def create(self, db: Session, project_data: ProjectCreate) -> ProjectModel:
-        db_project = ProjectModel(**project_data.dict())
+        db_project = ProjectModel(**project_data.model_dump())
         db.add(db_project)
         db.commit()
         db.refresh(db_project)

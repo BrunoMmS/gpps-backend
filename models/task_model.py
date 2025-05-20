@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
-from db.db import BaseDBModel 
 from sqlalchemy.orm import relationship
+from db.db import BaseDBModel 
 
 class TaskModel(BaseDBModel):
     __tablename__ = "tasks"
@@ -9,5 +9,8 @@ class TaskModel(BaseDBModel):
     description = Column(String, nullable=False)
     done = Column(Boolean, nullable=False, default=False)
     activity_id = Column(Integer, ForeignKey("Activity.id"))
-    activity = relationship("Activities", back_populates="tasks")
-    
+
+    activity = relationship(
+        "ActivityModel",
+        back_populates="tasks"
+    )

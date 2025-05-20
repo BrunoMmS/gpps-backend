@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from db.db import BaseDBModel  
 
@@ -12,7 +12,8 @@ class ProjectModel(BaseDBModel):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=True)
 
-    workplan_id = Column(Integer, ForeignKey("Plan_de_Trabajo.id"))
-    workplan = relationship("WorkPlan")
-
-
+    workplan = relationship(
+        "WorkPlan",
+        back_populates="project",
+        uselist=False
+    )
