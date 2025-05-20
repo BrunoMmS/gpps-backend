@@ -8,6 +8,7 @@ class Project(BaseModel):
     title: str
     description: str
     active: bool
+    tutor_id: int
     start_date: date
     end_date: date
     workplan: Optional[WorkPlan] = None

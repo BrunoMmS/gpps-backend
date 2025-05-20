@@ -32,3 +32,12 @@ class ActivityEntity:
     
     def isFinished(self) -> bool:
         return self.__done
+
+    def get_complete_percent(self) -> float:
+        if not self.__jobs:
+            raise ValueError("No hay tareas en la actividad")
+        completed_tasks = sum(1 for task in self.__jobs if task.isDone())
+        return (completed_tasks / len(self.__jobs)) * 100
+    
+    def get_incomplete_percent(self) -> float:
+        return 100 - self.get_complete_percent()

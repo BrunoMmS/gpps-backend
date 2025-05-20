@@ -8,7 +8,8 @@ class ProjectModel(BaseDBModel):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    active = Column(Boolean, default=True)
+    tutor_id = Column(Integer, nullable=False)
+    active = Column(Boolean, default=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=True)
 

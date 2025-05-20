@@ -25,3 +25,12 @@ class WorkplanEntity:
 
     def getDescription(self) -> str:
         return self.__description
+    
+    def get_completed_percent(self) -> float:
+        if not self.__activities:
+            raise ValueError("No hay actividades en el plan de trabajo")
+        completed_activities = sum(1 for activity in self.__activities if activity.isDone())
+        return (completed_activities / len(self.__activities)) * 100
+    
+    def get_incopmlete_percent(self) -> float:
+        return 100 - self.get_completed_percent()
