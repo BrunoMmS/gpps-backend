@@ -1,7 +1,7 @@
 import re
 
 class UserEntity:
-    def __init__(self, id: int, username: str, lastname: str, 
+    def __init__(self, id: int, username: str, password: str, lastname: str, 
                  email: str, role: str):
         if not isinstance(id, int) or id < 0:
             raise ValueError("ID debe ser un entero positivo.")
@@ -17,7 +17,7 @@ class UserEntity:
         
         #if role not in {"admin", "user", "tutor"}:
         #    raise ValueError(f"Rol inválido: {role}")
-
+        self.__password : str = password
         self.__id: int = id
         self.__username: str = username
         self.__lastname: str = lastname
@@ -29,7 +29,10 @@ class UserEntity:
 
     def getUsername(self) -> str:
         return self.__username
-
+    
+    def getLastname(self) -> str:
+        return self.__lastname
+    
     def getEmail(self) -> str:
         return self.__email
 
@@ -38,3 +41,6 @@ class UserEntity:
 
     def getId(self) -> int:
         return self.__id
+    
+    def getPassword(self) -> str:
+        return self.__password
