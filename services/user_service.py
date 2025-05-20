@@ -3,6 +3,8 @@ from cruds.UserDAO import UserDAO
 from schema.user_schema import UserCreate, UserLogin, User
 from entities.user_entity import UserEntity
 from models.user_model import UserModel
+from entities.project_entity import ProjectEntity
+from services.rol import Rol 
 
 class UserService:
     def __init__(self):
@@ -59,3 +61,30 @@ class UserService:
             email=user_entity.getEmail(),
             role=user_entity.getRole()
         )
+
+    ##def add_tutor(user_entity: UserEntity, project: ProjectEntity, tutor: UserEntity) -> None:
+
+        if user_entity.role != Rol.admin or user_entity.role != Rol.exEntity:
+            raise ValueError("No tienes permisos para agregar un tutor")
+        
+        if tutor.role != Rol.teacher or tutor.role != Rol.teacher2:
+            raise ValueError("No estas agregando un tutor")
+        
+        if project.tutor_id is not None:
+            raise ValueError("El proyecto ya tiene un tutor asignado")
+        
+        project.tutor_id = tutor.id
+
+    ##def project_aprove(user_entity: UserEntity, project: ProjectEntity) -> ProjectEntity:
+        if user_entity.role != "Administrator":
+            raise ValueError("No tienes permisos para aprobar un proyecto")
+        
+        if project.active:
+            raise ValueError("El proyecto ya fue aprobado")
+        
+        if project.tutor_id is None:
+            raise ValueError("El proyecto no tiene tutor asignado")
+        
+        project.active = True
+        return project
+          

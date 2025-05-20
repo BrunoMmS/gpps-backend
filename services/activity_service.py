@@ -20,28 +20,7 @@ class ActivityService:
                 return False
         self.done = True
         return True
-    
-    def get_complete_percentage(self, db: Session, activity_id: int) -> float:
-        activity = self.activity_dao.get_by_id(db, activity_id)
-        if not activity:
-            return 0.0
-        tasks = self.tasks_dao.list_by_activity(db, activity_id)
-        total_tasks = len(tasks)
-        if total_tasks == 0:
-            return 0.0
-        completed_tasks = sum(1 for task in tasks if task.done)
-        return (completed_tasks / total_tasks) * 100
-    
-    def get_incomplete_percentage(self, db: Session, activity_id: int) -> float:
-        activity = self.activity_dao.get_by_id(db, activity_id)
-        if not activity:
-            return 0.0
-        tasks = self.tasks_dao.list_by_activity(db, activity_id)
-        total_tasks = len(tasks)
-        if total_tasks == 0:
-            return 0.0
-        incomplete_tasks = sum(1 for task in tasks if task.done == False)
-        return (incomplete_tasks / total_tasks) * 100
+
     
     def create_Activities(self, newActivities: ActivitieCreate):
         new_activities= self.activity_dao.create(newActivities)

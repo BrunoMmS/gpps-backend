@@ -8,3 +8,5 @@ class WorkPlanService:
     def create_workplan(self, db: Session,  workplan_data: WorkPlanCreate) -> WorkPlanCreate:
 
         return self.workplan_dao.create(db, workplan_data)
+    
+    

@@ -44,3 +44,5 @@ class UserEntity:
     
     def getPassword(self) -> str:
         return self.__password
+
+
