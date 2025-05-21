@@ -3,11 +3,11 @@ from entities.project_entity import ProjectEntity
 
 
 class WorkplanEntity:
-    def __init__(self, id: int, project: ProjectEntity = None, description: str = "", activities: list[ActivityEntity] = None):
+    def __init__(self, id: int, project: ProjectEntity, description: str = "", activities: list[ActivityEntity] = []):
         self.__id: int = id
         self.__project: ProjectEntity = project
         self.__description: str = description
-        self.__activities: list[ActivityEntity] = activities if activities is not None else []
+        self.__activities: list[ActivityEntity] = activities
 
     
     def addActivity(self, activity: ActivityEntity) -> None:

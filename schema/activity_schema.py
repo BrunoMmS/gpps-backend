@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from schema.task_schema import Task, TaskCreate
 class Activitie(BaseModel):
@@ -5,7 +6,9 @@ class Activitie(BaseModel):
     name: str
     duration: int
     done: bool
-    jobs: list[Task]
+    jobs: Optional[list[Task]] = []
+    class Config:
+        from_attributes = True
 
 class ActivitieCreate(BaseModel):
     name: str
