@@ -25,25 +25,29 @@ class UserService:
 
         user_model = self.dao.create(db, user_entity)
 
-        return self.__to_schema(self.__to_entity(user_model))
+        return self.__to_schema(self.to_entity(user_model))
 
     def autenticar_usuario(self, db: Session, credentials: UserLogin) -> User:
-        user_entity = UserEntity(
-            email=credentials.email,
-            password=credentials.password
-        )
 
-        user_model = self.dao.authenticate(db, user_entity)
+
+        user_model = self.dao.authenticate(db, credentials.email, credentials.password)
         if not user_model:
             raise ValueError("Credenciales inválidas")
         
-        return self.__to_schema(self.__to_entity(user_model))
+        return self.__to_schema(self.to_entity(user_model))
 
     def listar_usuarios(self, db: Session) -> list[User]:
         user_models = self.dao.list(db)
-        return [self.__to_schema(self.__to_entity(user)) for user in user_models]
+        return [self.__to_schema(self.to_entity(user)) for user in user_models]
 
-    def __to_entity(self, user_model: UserModel) -> UserEntity:
+    def get_user_by_id(self, db: Session, user_id: int) -> UserCreate:
+        user_model = self.dao.get_by_id(db, user_id)
+        if not user_model:
+            raise ValueError("Usuario no encontrado")
+        
+        return self.__to_schema(self.to_entity(user_model))
+    
+    def to_entity(self, user_model: UserModel) -> UserEntity:
         return UserEntity(
             id=user_model.id,
             password=user_model.password,
@@ -53,9 +57,10 @@ class UserService:
             role=user_model.role
         )
 
-    def __to_schema(self, user_entity: UserEntity) -> User:
-        return User(
+    def __to_schema(self, user_entity: UserEntity) -> UserCreate:
+        return UserCreate(
             id=user_entity.getId(),
+            password=user_entity.getPassword(),
             username=user_entity.getUsername(),
             lastname=user_entity.getLastname(),
             email=user_entity.getEmail(),

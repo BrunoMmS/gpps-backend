@@ -35,8 +35,8 @@ class UserDAO:
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self.pwd_context.verify(plain_password, hashed_password)
 
-    def authenticate(self, db: Session, login_data: UserEntity) -> UserModel | None:
-        user = self.get_by_email(db, login_data.getEmail())
-        if not user or not self.verify_password(login_data.password, user.password):
+    def authenticate(self, db: Session, email: str, password: str) -> UserModel | None:
+        user = self.get_by_email(db, email)
+        if not user or not self.verify_password(password, user.password):
             return None
         return user

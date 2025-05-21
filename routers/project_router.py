@@ -41,3 +41,11 @@ def add_workplan(workplan: WorkPlanCreate,db: Session = Depends(get_db)):
 #de momento, hice las clases DAO, pero lo q me falta es implementar los metodos para:
 # calcularPorcentajeTotal,calcularPorcentajeHecho,calcularPorcentajeNoHecho
 # meter la logica para poder devolver todo en los service, solo hice para proyectPPS
+
+@project_router.get("/assignUserToProject/{project_id}/{user_id}/{user_to_assign}", response_model=dict)
+def assign_user_to_project(user_id: int, project_id: int, user_to_assign: int,db: Session = Depends(get_db)):
+    try:
+        project_service.assign_user_to_project(db, project_id, user_id, user_to_assign)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"message": "Usuario asignado con exito"}
