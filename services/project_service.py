@@ -1,18 +1,17 @@
 from sqlalchemy.orm import Session
-from cruds.UserInProjectDAO import UserInProjectDAO
+from cruds.userInProjectDAO import UserInProjectDAO
 from cruds.projectDAO import ProjectDAO
 from cruds.workplanDAO import WorkPlanDAO
 from cruds.activityDAO import ActivityDAO
 from cruds.taskDAO import TaskDAO
 from entities.project_entity import ProjectEntity
 from entities.user_in_project_entity import UserInProjectEntity
-from schema.project_schema import ProjectCreate
-from schema.workplan_schema import WorkPlanCreate
+from schemas.project_schema import ProjectCreate
+from schemas.workplan_schema import WorkPlanCreate
 from models.project_model import ProjectModel
 from services.rol import Rol
 from services.user_service import UserService
 from services.workplan_service import WorkPlanService
-
 
 class ProjectService:
     def __init__(self):

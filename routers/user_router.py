@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from schema.user_schema import UserCreate, UserLogin, User
+from schemas.user_schema import UserCreate, UserLogin, User
 from services.user_service import UserService
 from db.db import SessionLocal
 
@@ -35,5 +35,8 @@ def list_users(db: Session = Depends(get_db)):
     return user_service.listar_usuarios(db)
 
 @user_router.get("/{idUser}", response_model=User)
-def list_users(idUser: int, db: Session = Depends(get_db)):
-    return user_service.get_user_by_id(db, idUser)
+def get_user_by_id(idUser: int, db: Session = Depends(get_db)):
+    try:
+        return user_service.get_user_by_id(db, idUser)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

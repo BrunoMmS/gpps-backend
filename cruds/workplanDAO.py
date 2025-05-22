@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.workplan_model import WorkPlan
-from schema.workplan_schema import WorkPlanCreate
+from schemas.workplan_schema import WorkPlanCreate
 
 class WorkPlanDAO:
     def get_by_id(self, db: Session, workplan_id: int) -> WorkPlan | None:
@@ -12,4 +12,3 @@ class WorkPlanDAO:
         db.commit()
         db.refresh(db_workplan)
         return db_workplan
-    

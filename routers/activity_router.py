@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from db.db import SessionLocal
-from schema.activity_schema import ActivitieCreate, Activitie
-from schema.task_schema import TaskCreate
+from schemas.activity_schema import ActivitieCreate, Activitie
+from schemas.task_schema import TaskCreate
 from services.activity_service import ActivityService
 
 activity_router = APIRouter(prefix="/activity", tags=["activity"])

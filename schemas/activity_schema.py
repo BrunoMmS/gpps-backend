@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
-from schema.task_schema import Task, TaskCreate
+from schemas.task_schema import Task, TaskCreate
+
 class Activitie(BaseModel):
     id: int
     name: str

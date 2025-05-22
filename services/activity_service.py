@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from cruds.taskDAO import TaskDAO
 from cruds.activityDAO import ActivityDAO
 from cruds.workplanDAO import WorkPlanDAO
-from schema.activity_schema import ActivitieCreate
-from schema.task_schema import TaskCreate
+from schemas.activity_schema import ActivitieCreate
+from schemas.task_schema import TaskCreate
 from models.activity_model import ActivityModel
 from models.task_model import TaskModel
 
