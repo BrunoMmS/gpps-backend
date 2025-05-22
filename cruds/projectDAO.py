@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from entities.project_entity import ProjectEntity
 from models.project_model import ProjectModel
-from schema.project_schema import ProjectCreate
+from schemas.project_schema import ProjectCreate
 from typing import List, Optional
 
 class ProjectDAO:

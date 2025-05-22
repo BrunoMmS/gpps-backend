@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schema.activity_schema import Activitie
+from schemas.activity_schema import Activitie
 from typing import Optional
 
 class WorkPlan(BaseModel):

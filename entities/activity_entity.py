@@ -1,6 +1,5 @@
 from entities.task_entity import TaskEntity
 
-
 class ActivityEntity:
     def __init__(self, id: int, name: str, duration: int, 
                  done: bool, jobs: list[TaskEntity] = []):

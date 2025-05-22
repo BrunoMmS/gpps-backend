@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.task_model import TaskModel
-from schema.task_schema import Task
+from schemas.task_schema import Task
 from models.activity_model import ActivityModel
 
 class TaskDAO:

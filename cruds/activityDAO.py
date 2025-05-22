@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from models.activity_model import ActivityModel
 from models.workplan_model import WorkPlan
-from schema.activity_schema import ActivitieCreate
+from schemas.activity_schema import ActivitieCreate
 
 class ActivityDAO:
     def get_by_id(self, db: Session, activity_id: int) -> ActivityModel | None:

@@ -1,7 +1,6 @@
 from entities.activity_entity import ActivityEntity
 from entities.project_entity import ProjectEntity
 
-
 class WorkplanEntity:
     def __init__(self, id: int, project: ProjectEntity, description: str = "", activities: list[ActivityEntity] = []):
         self.__id: int = id
