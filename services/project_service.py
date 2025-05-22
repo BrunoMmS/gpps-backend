@@ -44,6 +44,14 @@ class ProjectService:
     def add_workplan(self, db: Session,  workplan_data: WorkPlanCreate):      
         return self.workplan_service.create_workplan(db,  workplan_data)
     
+    def list_projects(self, db: Session) -> list[ProjectModel]:
+        projects = self.project_dao.list(db)
+        return projects
+    
+    def list_projects_by_user(self, idUser: int, db: Session) -> list[ProjectModel]:
+        projects = self.project_dao.list_by_user(db, idUser)
+        return projects
+    
     def assign_user_to_project(self, db: Session, project_id: int, user_id: int, id_user_to_assign: int):
         project = self.project_dao.get_by_id(db, project_id)
         if not project:

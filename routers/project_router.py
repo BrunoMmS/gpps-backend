@@ -23,6 +23,13 @@ def create(project: ProjectCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
     return created_project
 
+@project_router.get("/", response_model=list[Project])
+def list_projects(db: Session = Depends(get_db)):
+    return project_service.list_projects(db)
+
+@project_router.get("/{idUser}", response_model=list[Project])
+def list_projects_by_user(idUser: int, db: Session = Depends(get_db)):
+    return project_service.list_projects_by_user(idUser, db)
 
 @project_router.post("/assignUserToProject", response_model=dict)
 def assign_user_to_project(user_id: int, project_id: int, user_to_assign: int,db: Session = Depends(get_db)):
