@@ -1,5 +1,6 @@
 # models/user.py
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from db.db import BaseDBModel
 
 class UserModel(BaseDBModel):
@@ -11,3 +12,9 @@ class UserModel(BaseDBModel):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
+
+    projects = relationship(
+        "UserInProjectModel",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )

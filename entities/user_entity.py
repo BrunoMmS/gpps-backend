@@ -1,5 +1,7 @@
 import re
 
+from services.rol import Rol
+
 class UserEntity:
     def __init__(self, id: int, username: str, password: str, lastname: str, 
                  email: str, role: str):
@@ -14,9 +16,10 @@ class UserEntity:
 
         if not self.__is_valid_email(email):
             raise ValueError("El email no tiene un formato válido.")
+
+        if role not in [Rol.admin, Rol.student, Rol.teacher, Rol.teacher2, Rol.exEntity]:
+            raise ValueError(f"Rol inválido: {role}")
         
-        #if role not in {"admin", "user", "tutor"}:
-        #    raise ValueError(f"Rol inválido: {role}")
         self.__password : str = password
         self.__id: int = id
         self.__username: str = username

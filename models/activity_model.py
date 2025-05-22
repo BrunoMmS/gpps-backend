@@ -14,7 +14,7 @@ class ActivityModel(BaseDBModel):
     workplan = relationship(
         "WorkPlan",
         back_populates="activities",
-        foreign_keys=[workplan_id]  # 🔧 especificamos la FK usada
+        foreign_keys=[workplan_id] 
     )
 
     tasks = relationship(

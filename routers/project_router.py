@@ -15,14 +15,6 @@ def get_db():
     finally:
         db.close()
 
-@project_router.post("/register", response_model=Project)
-def register(project: ProjectCreate, db: Session = Depends(get_db)):
-    try:
-        created_project = project_service.register_user(db, project)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    return created_project
-
 @project_router.post("/create", response_model=Project)
 def create(project: ProjectCreate, db: Session = Depends(get_db)):
     try:
@@ -31,13 +23,18 @@ def create(project: ProjectCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
     return created_project
 
-@project_router.post("/create_workplan", response_model=WorkPlan)
-def add_workplan(workplan: WorkPlanCreate,db: Session = Depends(get_db)):
+@project_router.get("/", response_model=list[Project])
+def list_projects(db: Session = Depends(get_db)):
+    return project_service.list_projects(db)
+
+@project_router.get("/{idUser}", response_model=list[Project])
+def list_projects_by_user(idUser: int, db: Session = Depends(get_db)):
+    return project_service.list_projects_by_user(idUser, db)
+
+@project_router.post("/assignUserToProject", response_model=dict)
+def assign_user_to_project(user_id: int, project_id: int, user_to_assign: int,db: Session = Depends(get_db)):
     try:
-        workplan = project_service.add_workplan(db, workplan)
+        project_service.assign_user_to_project(db, project_id, user_id, user_to_assign)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    return workplan
-#de momento, hice las clases DAO, pero lo q me falta es implementar los metodos para:
-# calcularPorcentajeTotal,calcularPorcentajeHecho,calcularPorcentajeNoHecho
-# meter la logica para poder devolver todo en los service, solo hice para proyectPPS
+    return {"message": "Usuario asignado con exito"}

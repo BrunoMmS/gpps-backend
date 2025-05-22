@@ -33,3 +33,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 @user_router.get("/", response_model=list[User])
 def list_users(db: Session = Depends(get_db)):
     return user_service.listar_usuarios(db)
+
+@user_router.get("/{idUser}", response_model=User)
+def list_users(idUser: int, db: Session = Depends(get_db)):
+    return user_service.get_user_by_id(db, idUser)

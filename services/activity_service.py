@@ -4,6 +4,9 @@ from cruds.activityDAO import ActivityDAO
 from cruds.workplanDAO import WorkPlanDAO
 from schema.activity_schema import ActivitieCreate
 from schema.task_schema import TaskCreate
+from models.activity_model import ActivityModel
+from models.task_model import TaskModel
+
 class ActivityService:
     def __init__(self):
         self.activity_dao = ActivityDAO()
@@ -14,24 +17,25 @@ class ActivityService:
         activity = self.activity_dao.get_by_id(db, activity_id)
         if not activity:
             return False
+        
         tasks = self.tasks_dao.list_by_activity(db, activity_id)
-        for task in tasks:
-            if not task.done:
-                return False
-        self.done = True
-        return True
+        return all(task.done for task in tasks)
 
-    
-    def create_Activities(self, newActivities: ActivitieCreate):
-        new_activities= self.activity_dao.create(newActivities)
-        return new_activities
-    
-    def append_Task(self,db: Session, activity_id: int, newTask: TaskCreate):
+    def create_activity(self, db: Session, workplan_id: int, activity_data: ActivitieCreate) -> ActivityModel:
+        workplan = self.workplan_dao.get_by_id(db, workplan_id)
+        if not workplan:
+            raise ValueError("Plan de trabajo no encontrado")
+
+        new_activity = self.activity_dao.create(db, activity_data, workplan_id)
+        return new_activity
+
+    def append_task(self, db: Session, activity_id: int, new_task_data: TaskCreate) -> TaskModel:
         activity = self.activity_dao.get_by_id(db, activity_id)
         if not activity:
-            raise ValueError(f"Activity with id {activity_id} not found")
-        task = self.tasks_dao.create(db, newTask)
+            raise ValueError("Actividad no encontrada")
+
+        task = self.tasks_dao.create(db, new_task_data, activity_id)
         return task
 
-    #mandar notificacion al completar una actividad o al mandar informes 
+        
 
