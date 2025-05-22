@@ -31,9 +31,9 @@ def test_assign_user_to_proyect():
     response = client.post(
         "/projects/assignUserToProject",
         params={
-            "user_id": 9,
-            "project_id": 50,
-            "user_to_assign": 6
+            "user_id": 4,
+            "project_id": 3,
+            "user_to_assign": 1
         }
     )
     assert response.status_code == 200
