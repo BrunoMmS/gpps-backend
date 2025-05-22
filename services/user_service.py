@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from cruds.userDAO import UserDAO
+from cruds.UserDAO import UserDAO
 from schemas.user_schema import UserCreate, UserLogin, User
 from entities.user_entity import UserEntity
 from models.user_model import UserModel

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from cruds.userInProjectDAO import UserInProjectDAO
+from cruds.UserInProjectDAO import UserInProjectDAO
 from cruds.projectDAO import ProjectDAO
 from cruds.workplanDAO import WorkPlanDAO
 from cruds.activityDAO import ActivityDAO
