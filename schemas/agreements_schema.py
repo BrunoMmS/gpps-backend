@@ -1,7 +1,7 @@
 # modelo de Convenios
 from datetime import date
 from pydantic import BaseModel
-from schema.project_schema import Project
+from schemas.project_schema import Project
 
 class Agreement(BaseModel):
     id: int

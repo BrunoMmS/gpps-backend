@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from cruds.taskDAO import TaskDAO
-from schema.task_schema import TaskCreate
+from schemas.task_schema import TaskCreate
 class TaskService:
     def __init__(self):
         self.tasks_dao = TaskDAO()

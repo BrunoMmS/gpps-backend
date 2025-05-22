@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from cruds.UserDAO import UserDAO
-from schema.user_schema import UserCreate, UserLogin, User
+from cruds.userDAO import UserDAO
+from schemas.user_schema import UserCreate, UserLogin, User
 from entities.user_entity import UserEntity
 from models.user_model import UserModel
 from entities.project_entity import ProjectEntity
@@ -40,7 +40,7 @@ class UserService:
         user_models = self.dao.list(db)
         return [self.__to_schema(self.to_entity(user)) for user in user_models]
 
-    def get_user_by_id(self, db: Session, user_id: int) -> UserCreate:
+    def get_user_by_id(self, db: Session, user_id: int) -> User: # Era UserCreate
         user_model = self.dao.get_by_id(db, user_id)
         if not user_model:
             raise ValueError("Usuario no encontrado")
@@ -57,7 +57,7 @@ class UserService:
             role=user_model.role
         )
 
-    def __to_schema(self, user_entity: UserEntity) -> UserCreate:
+    def __to_schema(self, user_entity: UserEntity) -> User: # Era UserCreate
         return UserCreate(
             id=user_entity.getId(),
             password=user_entity.getPassword(),
@@ -65,14 +65,16 @@ class UserService:
             lastname=user_entity.getLastname(),
             email=user_entity.getEmail(),
             role=user_entity.getRole()
-        )
+        ) #SUGERENCIA: En un futuro quitar password=user_entity.getPassword() ya que no se deberia mostrar la contraseña al usuario
 
-    ##def add_tutor(user_entity: UserEntity, project: ProjectEntity, tutor: UserEntity) -> None:
-
-        if user_entity.role != Rol.admin or user_entity.role != Rol.exEntity:
+"""      
+    def add_tutor(self, user_entity: UserEntity, project: ProjectEntity, tutor: UserEntity) -> None:
+        # CORREGIDO - Use 'and' en lugar de 'or'
+        if user_entity.role != Rol.admin and user_entity.role != Rol.exEntity:
             raise ValueError("No tienes permisos para agregar un tutor")
         
-        if tutor.role != Rol.teacher or tutor.role != Rol.teacher2:
+        # CORREGIDO - Use 'and' en lugar de 'or'
+        if tutor.role != Rol.teacher and tutor.role != Rol.teacher2:
             raise ValueError("No estas agregando un tutor")
         
         if project.tutor_id is not None:
@@ -80,8 +82,9 @@ class UserService:
         
         project.tutor_id = tutor.id
 
-    ##def project_aprove(user_entity: UserEntity, project: ProjectEntity) -> ProjectEntity:
-        if user_entity.role != "Administrator":
+    def project_aprove(self, user_entity: UserEntity, project: ProjectEntity) -> ProjectEntity:
+        # CORREGIDO - Use la constante de Rol en lugar de string
+        if user_entity.role != Rol.admin:
             raise ValueError("No tienes permisos para aprobar un proyecto")
         
         if project.active:
@@ -92,4 +95,4 @@ class UserService:
         
         project.active = True
         return project
-          
+"""

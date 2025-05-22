@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from cruds.workplanDAO import WorkPlanDAO
-from schema.workplan_schema import WorkPlanCreate
+from schemas.workplan_schema import WorkPlanCreate
 from services.rol import Rol
 from services.user_service import UserService
 

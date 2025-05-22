@@ -46,6 +46,4 @@ class UserEntity:
         return self.__id
     
     def getPassword(self) -> str:
-        return self.__password
-
-
+        return self.__password #La misma sugerencia de antes, no deberia mostrarse la contraseña al usuario

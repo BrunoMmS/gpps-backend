@@ -1,11 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-
 from db.db import SessionLocal
-from schema.workplan_schema import WorkPlan, WorkPlanCreate
+from schemas.workplan_schema import WorkPlan, WorkPlanCreate
 from services.workplan_service import WorkPlanService
-
-
 
 workplan_router = APIRouter(prefix="/workplan", tags=["workplan"])
 workplan_service = WorkPlanService()

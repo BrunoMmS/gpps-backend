@@ -21,4 +21,3 @@ class TaskEntity:
     
     def getId(self) -> int:
         return self.__id
-    
