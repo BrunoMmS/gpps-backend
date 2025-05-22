@@ -33,5 +33,5 @@ class ActivityService:
         task = self.tasks_dao.create(db, newTask)
         return task
 
-        
+    #mandar notificacion al completar una actividad o al mandar informes 
 
