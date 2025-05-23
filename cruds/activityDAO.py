@@ -11,7 +11,7 @@ class ActivityDAO:
         return db.query(ActivityModel).filter(ActivityModel.workplan_id == workplan_id).all()
 
     def create(self, db: Session, activity_data: ActivitieCreate, workplan_id: int) -> ActivityModel:
-        db_activity = ActivityModel(**activity_data.dict(), workplan_id=workplan_id)
+        db_activity = ActivityModel(**activity_data.model_dump(), workplan_id=workplan_id)
         db.add(db_activity)
         db.commit()
         db.refresh(db_activity)
