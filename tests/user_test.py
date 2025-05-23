@@ -5,8 +5,9 @@ def test_register_user_success(client):
         "lastname": "Test",
         "email": "test@example.com",
         "password": "securepassword123",
-        "role": "user"
+        "role": "Student"
     })
+   
     assert response.status_code == 200 or response.status_code == 201 
     data = response.json()
     assert "username" in data
@@ -19,23 +20,23 @@ def test_existing_user_mail(client):
       "lastname": "first",
       "email": "existing@example.com",
       "password": "password123",
-      "role": "user"
+      "role": "Student"
     })
 
     response = client.post("/users/register", json={
-      "id": 0,
+        "id": 0,
         "username": "anotheruser",
         "lastname": "Another",
         "email": "existing@example.com",
         "password": "password456",
-        "role": "user"
+        "role": "Student"
     })
 
     assert response.status_code != 200
 
 def test_empty_fields(client):
     response = client.post("/users/register", json={
-      "id": 0,
+        "id": 0,
         "username": "",
         "lastname": "",
         "email": "",
@@ -46,12 +47,12 @@ def test_empty_fields(client):
 
 def test_invalid_email_format(client):
     response = client.post("/users/register", json={
-      "id": 0,
+        "id": 0,
         "username": "testuser",
         "lastname": "test",
         "email": "invalid-email",
         "password": "securepassword123",
-        "role": "user"
+        "role": "Student"
     })
     assert response.status_code != 200
 
@@ -68,7 +69,7 @@ def test_invalid_role(client):
 
 def user_register_for_login(username, lastname, email, password, role, client):
     response = client.post("/users/register", json={
-      "id": 0,
+        "id": 0,
         "username": username,
         "lastname": lastname,
         "email": email,
@@ -85,7 +86,7 @@ def test_login_success(client):
         lastname="Test",
         email=test_email,
         password=test_password,
-        role="user",
+        role="Student",
         client=client
     )
 
@@ -97,7 +98,7 @@ def test_login_success(client):
 
 def test_login_invalid_credentials(client):
     user_register_for_login(
-        "testuser", "Test", "test@example.com", "securepassword123", "user", client
+        "testuser", "Test", "test@example.com", "securepassword123", "Student", client
     )
 
     response = client.post("/users/login", json={
@@ -108,7 +109,7 @@ def test_login_invalid_credentials(client):
 
 def test_login_empty_fields(client):
     user_register_for_login(
-        "testuser", "Test", "test@example.com", "securepassword123", "user", client
+        "testuser", "Test", "test@example.com", "securepassword123", "Student", client
     )
 
     response = client.post("/users/login", json={
