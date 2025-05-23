@@ -36,6 +36,6 @@ class ActivityService:
 
         task = self.tasks_dao.create(db, new_task_data, activity_id)
         return task
-    
-    def get_activities_by_workplan(self, db: Session, workplan_id: int):
-        return self.activity_dao.list_by_workplan(db, workplan_id)
+
+        
+

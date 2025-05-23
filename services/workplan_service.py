@@ -19,5 +19,5 @@ class WorkPlanService:
             raise ValueError("El usuario no tiene permisos para crear un plan de trabajo")
         
         return self.workplan_dao.create(db, workplan_data)
-    
-    
+
+    #mandar notificacion al alcanzar un porcentaje completo 

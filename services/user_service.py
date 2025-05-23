@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from cruds.userDAO import UserDAO
+from cruds.UserDAO import UserDAO
 from schemas.user_schema import UserCreate, UserLogin, User
 from entities.user_entity import UserEntity
 from models.user_model import UserModel
@@ -67,7 +67,7 @@ class UserService:
             role=user_entity.getRole()
         ) #SUGERENCIA: En un futuro quitar password=user_entity.getPassword() ya que no se deberia mostrar la contraseña al usuario
 
-"""      
+     
     def add_tutor(self, user_entity: UserEntity, project: ProjectEntity, tutor: UserEntity) -> None:
         # CORREGIDO - Use 'and' en lugar de 'or'
         if user_entity.role != Rol.admin and user_entity.role != Rol.exEntity:
@@ -95,4 +95,4 @@ class UserService:
         
         project.active = True
         return project
-"""
+          
