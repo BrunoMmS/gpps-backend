@@ -9,6 +9,7 @@ from entities.user_in_project_entity import UserInProjectEntity
 from schemas.project_schema import ProjectCreate
 from schemas.workplan_schema import WorkPlanCreate
 from models.project_model import ProjectModel
+from services.notification_service import NotificationService
 from services.rol import Rol
 from services.user_service import UserService
 from services.workplan_service import WorkPlanService
@@ -18,6 +19,7 @@ class ProjectService:
         self.project_dao = ProjectDAO()
         self.workplan_service = WorkPlanService()
         self.user_service = UserService()
+        
 
     def create_project(self, db: Session, project_data: ProjectCreate) -> ProjectModel:
         user = self.user_service.get_user_by_id(db, project_data.user_id)
@@ -83,3 +85,26 @@ class ProjectService:
         user_to_project_dao = UserInProjectDAO()
 
         user_to_project_dao.create(db, user_to_project_entity)
+        notification_service = NotificationService(db)
+        notification_service.notify(user_to_assign.id, f"Has sido asignado al proyecto {project.title} por {user.username}")
+
+    def approve_project(self, db: Session, project_id: int) -> ProjectModel:
+        project = self.project_dao.get_by_id(db, project_id)
+        
+        if not project:
+            raise ValueError("Project not found")
+
+        project_entity = ProjectEntity(
+            id=project.id,
+            title=project.title,
+            description=project.description,
+            active=True,  
+            start_date=project.start_date,
+            end_date=project.end_date,
+            user=self.user_service.to_entity(self.user_service.get_user_by_id(db, project.user_id))
+        )
+        self.project_dao.update(db, project_entity)
+
+        notification_service = NotificationService(db)
+        notification_service.notify(project.user_id, f"Tu proyecto {project.title} ha sido aprobado.")
+        return project

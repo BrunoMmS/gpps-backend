@@ -30,3 +30,20 @@ class ProjectDAO:
         db.refresh(db_project)
 
         return db_project
+    def update(self, db: Session, project_data: ProjectEntity) -> ProjectModel:
+        db_project = db.query(ProjectModel).filter(ProjectModel.id == project_data.getId()).first()
+
+        if not db_project:
+            raise Exception("Project not found")
+
+        db_project.title = project_data.getTitle()
+        db_project.description = project_data.getDescription()
+        db_project.active = project_data.isActive()
+        db_project.start_date = project_data.getStartDate()
+        db_project.end_date = project_data.getEndDate()
+        db_project.user_id = project_data.getUser().getId()
+
+        db.commit()
+        db.refresh(db_project)
+
+        return db_project

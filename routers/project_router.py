@@ -23,6 +23,14 @@ def create(project: ProjectCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
     return created_project
 
+@project_router.put("/approve/{project_id}", response_model=Project)
+def approve(project_id: int, db: Session = Depends(get_db)):
+    try:
+        project = project_service.approve_project(db, project_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return project
+
 @project_router.get("/", response_model=list[Project])
 def list_projects(db: Session = Depends(get_db)):
     return project_service.list_projects(db)
