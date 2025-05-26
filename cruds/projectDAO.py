@@ -62,3 +62,16 @@ class ProjectDAO:
         .first()
         )
         return ProyectComplete.from_orm(proyect) if proyect else None
+    
+    def get_proyect_complete_by_user(self,db:Session, user_id:int) -> Optional[ProyectComplete]:
+        proyect = (
+            db.query(ProjectModel)
+            .options(
+               joinedload(ProjectModel.workplan)
+               .joinedload(WorkPlan.activities)
+                .joinedload(ActivityModel.tasks)
+        )
+        .filter(ProjectModel.user_id == user_id)
+        .first()
+        )
+        return ProyectComplete.from_orm(proyect) if proyect else None

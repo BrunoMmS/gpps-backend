@@ -116,3 +116,11 @@ class ProjectService:
             raise ValueError("Proyecto no encontrado")
 
         return ProyectComplete.from_orm(project_model)
+    
+    def get_complete_project_by_user(self, db: Session, user_id: int) -> ProyectComplete:
+        project_model = self.project_dao.get_proyect_complete(db, user_id)
+
+        if not project_model:
+            raise ValueError("El usuario no esta adjunto a ningun proyecto")
+
+        return ProyectComplete.from_orm(project_model)
