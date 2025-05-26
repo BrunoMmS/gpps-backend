@@ -50,6 +50,16 @@ def assign_user_to_project(user_id: int, project_id: int, user_to_assign: int,db
         raise HTTPException(status_code=400, detail=str(e))
     return {"message": "Usuario asignado con exito"}
 
+@project_router.get("/project/getProjectWithUser/{idProject}")
+def get_project_with_user(idProject: int, db: Session = Depends(get_db)):
+    try:
+        project = project_service.get_project_with_user(db, idProject)
+        if not project:
+            raise HTTPException(status_code=404, detail="Projecto no encontrado")
+        return project
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 """
 @project_router.get("/with-creators", response_model=list[ProjectWithCreator])
 def list_projects_with_creators(db: Session = Depends(get_db)):
