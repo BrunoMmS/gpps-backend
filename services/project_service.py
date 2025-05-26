@@ -127,7 +127,7 @@ class ProjectService:
             active=project.active,
             start_date=project.start_date,
             end_date=project.end_date,
-            user=self.user_service.to_schema(user)
+            user=self.user_service.get_user_by_id(db, user.id)
         )
 
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from schemas.workplan_schema import WorkPlan, WorkPlanCreate
 from services.project_service import ProjectService
-from schemas.project_schema import Project, ProjectCreate
+from schemas.project_schema import Project, ProjectCreate, ProjectWithUser
 from db.db import SessionLocal
 
 project_router = APIRouter(prefix="/projects", tags=["projects"])
@@ -50,7 +50,7 @@ def assign_user_to_project(user_id: int, project_id: int, user_to_assign: int,db
         raise HTTPException(status_code=400, detail=str(e))
     return {"message": "Usuario asignado con exito"}
 
-@project_router.get("/project/getProjectWithUser/{idProject}")
+@project_router.get("/project/getProjectWithUser/{idProject}", response_model = ProjectWithUser)
 def get_project_with_user(idProject: int, db: Session = Depends(get_db)):
     try:
         project = project_service.get_project_with_user(db, idProject)
