@@ -6,7 +6,7 @@ from cruds.activityDAO import ActivityDAO
 from cruds.taskDAO import TaskDAO
 from entities.project_entity import ProjectEntity
 from entities.user_in_project_entity import UserInProjectEntity
-from schemas.project_schema import ProjectCreate
+from schemas.project_schema import ProjectCreate, ProyectComplete
 from schemas.workplan_schema import WorkPlanCreate
 from models.project_model import ProjectModel
 from services.notification_service import NotificationService
@@ -108,3 +108,11 @@ class ProjectService:
         notification_service = NotificationService(db)
         notification_service.notify(project.user_id, f"Tu proyecto {project.title} ha sido aprobado.")
         return project
+    
+    def get_complete_project(self, db: Session, proyect_id: int) -> ProyectComplete:
+        project_model = self.project_dao.get_proyect_complete(db, proyect_id)
+
+        if not project_model:
+            raise ValueError("Proyecto no encontrado")
+
+        return ProyectComplete.from_orm(project_model)

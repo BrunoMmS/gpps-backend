@@ -1,9 +1,11 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from entities.project_entity import ProjectEntity
 from models.project_model import ProjectModel
-from schemas.project_schema import ProjectCreate
+from schemas.project_schema import ProyectComplete
 from typing import List, Optional
-
+from models.workplan_model import WorkPlan
+from models.activity_model import ActivityModel
+from models.task_model import TaskModel
 class ProjectDAO:
     def get_by_id(self, db: Session, project_id: int) -> ProjectModel | None:
         return db.query(ProjectModel).filter(ProjectModel.id == project_id).first()
@@ -47,3 +49,16 @@ class ProjectDAO:
         db.refresh(db_project)
 
         return db_project
+    
+    def get_proyect_complete(self,db: Session, proyect_id: int) -> Optional[ProyectComplete]:
+        proyect = (
+        db.query(ProjectModel)
+        .options(
+            joinedload(ProjectModel.workplan)
+            .joinedload(WorkPlan.activities)
+            .joinedload(ActivityModel.tasks)
+        )
+        .filter(ProjectModel.id == proyect_id )
+        .first()
+        )
+        return ProyectComplete.from_orm(proyect) if proyect else None
