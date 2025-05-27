@@ -56,7 +56,7 @@ def get_project_complete(project_id: int, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-@project_router.get("/projects/{user_id}/complete", response_model=ProyectComplete)
+@project_router.get("/{user_id}/complete", response_model=list[ProyectComplete])
 def get_project_complete_by_user(user_id: int, db: Session = Depends(get_db)):
     try:
         return project_service.get_complete_project_by_user(db, user_id)

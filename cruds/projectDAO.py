@@ -66,20 +66,21 @@ class ProjectDAO:
     )
         if not proyect:
           return None
-        proyect_complete = ProyectComplete.from_orm(proyect)
+        proyect_complete = ProyectComplete.model_validate(proyect)
         proyect_complete.creator = proyect.creator
         return proyect_complete
     
     def get_projects_complete_by_user(self, db: Session, user_id: int) -> List[ProyectComplete]:
         proyectos = (
-          db.query(ProjectModel)
-           .options(
-            joinedload(ProjectModel.workplan)
-            .joinedload(WorkPlan.activities)
-            .joinedload(ActivityModel.tasks),
-            joinedload(ProjectModel.creator)
+            db.query(ProjectModel)
+            .options(
+                joinedload(ProjectModel.workplan)
+                .joinedload(WorkPlan.activities)
+                .joinedload(ActivityModel.tasks),
+                joinedload(ProjectModel.creator)
             )
             .filter(ProjectModel.user_id == user_id)
             .all()
         )
+
         return [ProyectComplete.from_orm(proy) for proy in proyectos]

@@ -7,7 +7,7 @@ class Activitie(BaseModel):
     name: str
     duration: int
     done: bool
-    jobs: Optional[list[Task]] = []
+    tasks: Optional[list[Task]] = []
     class Config:
         from_attributes = True
 
