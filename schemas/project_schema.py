@@ -1,6 +1,7 @@
 from datetime import date
 from pydantic import BaseModel
 from typing import Optional
+from schemas.workplan_schema import WorkPlan
 from schemas.user_schema import User
 from schemas.workplan_schema import WorkPlan
 
@@ -31,6 +32,19 @@ class ProjectCreate(BaseModel):
     start_date: date
     user_id: int
     end_date: Optional[date] = None
+
+class ProyectComplete(BaseModel):
+    id: int
+    title: str
+    description: str
+    active: bool
+    start_date: date
+    user_id: int
+    end_date: Optional[date] = None
+    workplan: Optional[WorkPlan] = None
+
+    class Config:
+        from_attributes = True
 
 """
 class ProjectWithCreator(BaseModel):
