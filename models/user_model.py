@@ -12,6 +12,7 @@ class UserModel(BaseDBModel):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
+    created_projects = relationship("ProjectModel", back_populates="creator")
 
     projects = relationship(
         "UserInProjectModel",
