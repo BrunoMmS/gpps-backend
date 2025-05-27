@@ -79,12 +79,7 @@ class ProjectDAO:
             .joinedload(ActivityModel.tasks),
             joinedload(ProjectModel.creator)
             )
-            .filter(
-                or_(
-                ProjectModel.user_id == user_id,
-                ProjectModel.users.any(UserInProjectModel.user_id == user_id)
-                )
-            )
-        .all()
+            .filter(ProjectModel.user_id == user_id)
+            .all()
         )
         return [ProyectComplete.from_orm(proy) for proy in proyectos]
