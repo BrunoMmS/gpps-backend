@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from schemas.workplan_schema import WorkPlan, WorkPlanCreate
 from services.project_service import ProjectService
-from schemas.project_schema import Project, ProjectCreate, ProyectComplete
+from schemas.project_schema import Project, ProjectCreate, ProyectComplete, ProjectWithUser
 from db.db import SessionLocal
 
 project_router = APIRouter(prefix="/projects", tags=["projects"])
@@ -65,6 +65,16 @@ def get_project_complete_by_user(user_id: int, db: Session = Depends(get_db)):
 
 
 
+
+@project_router.get("/project/getProjectWithUser/{idProject}", response_model = ProjectWithUser)
+def get_project_with_user(idProject: int, db: Session = Depends(get_db)):
+    try:
+        project = project_service.get_project_with_user(db, idProject)
+        if not project:
+            raise HTTPException(status_code=404, detail="Projecto no encontrado")
+        return project
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 """
 @project_router.get("/with-creators", response_model=list[ProjectWithCreator])

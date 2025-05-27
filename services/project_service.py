@@ -6,7 +6,7 @@ from cruds.activityDAO import ActivityDAO
 from cruds.taskDAO import TaskDAO
 from entities.project_entity import ProjectEntity
 from entities.user_in_project_entity import UserInProjectEntity
-from schemas.project_schema import ProjectCreate, ProyectComplete
+from schemas.project_schema import ProjectCreate, ProyectComplete, ProjectWithUser
 from schemas.workplan_schema import WorkPlanCreate
 from models.project_model import ProjectModel
 from services.notification_service import NotificationService
@@ -124,3 +124,25 @@ class ProjectService:
             raise ValueError("El usuario no esta adjunto a ningun proyecto")
 
         return ProyectComplete.from_orm(project_model)
+    def get_project_with_user(self, db: Session, project_id: int) -> ProjectWithUser:
+        project = self.project_dao.get_by_id(db, project_id)
+        
+        if not project:
+            raise ValueError("Project not found")
+        
+        user = self.user_service.get_user_by_id(db, project.user_id)
+        if not user:
+            raise ValueError("User not found")
+        
+        return ProjectWithUser(
+            id=project.id,
+            title=project.title,
+            description=project.description,
+            active=project.active,
+            start_date=project.start_date,
+            end_date=project.end_date,
+            user=self.user_service.get_user_by_id(db, user.id)
+        )
+
+
+        
