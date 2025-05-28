@@ -1,6 +1,8 @@
+from operator import or_
 from sqlalchemy.orm import Session, joinedload
 from entities.project_entity import ProjectEntity
 from models.project_model import ProjectModel
+from models.user_in_project_model import UserInProjectModel
 from schemas.project_schema import ProyectComplete
 from typing import List, Optional
 from models.workplan_model import WorkPlan
@@ -56,22 +58,29 @@ class ProjectDAO:
         .options(
             joinedload(ProjectModel.workplan)
             .joinedload(WorkPlan.activities)
-            .joinedload(ActivityModel.tasks)
+            .joinedload(ActivityModel.tasks),
+            joinedload(ProjectModel.creator)
         )
         .filter(ProjectModel.id == proyect_id )
         .first()
-        )
-        return ProyectComplete.from_orm(proyect) if proyect else None
+    )
+        if not proyect:
+          return None
+        proyect_complete = ProyectComplete.model_validate(proyect)
+        proyect_complete.creator = proyect.creator
+        return proyect_complete
     
-    def get_proyect_complete_by_user(self,db:Session, user_id:int) -> Optional[ProyectComplete]:
-        proyect = (
+    def get_projects_complete_by_user(self, db: Session, user_id: int) -> List[ProyectComplete]:
+        proyectos = (
             db.query(ProjectModel)
             .options(
-               joinedload(ProjectModel.workplan)
-               .joinedload(WorkPlan.activities)
-                .joinedload(ActivityModel.tasks)
+                joinedload(ProjectModel.workplan)
+                .joinedload(WorkPlan.activities)
+                .joinedload(ActivityModel.tasks),
+                joinedload(ProjectModel.creator)
+            )
+            .filter(ProjectModel.user_id == user_id)
+            .all()
         )
-        .filter(ProjectModel.user_id == user_id)
-        .first()
-        )
-        return ProyectComplete.from_orm(proyect) if proyect else None
+
+        return [ProyectComplete.from_orm(proy) for proy in proyectos]
