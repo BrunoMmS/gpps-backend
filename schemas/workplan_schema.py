@@ -13,3 +13,5 @@ class WorkPlan(BaseModel):
 class WorkPlanCreate(BaseModel):
     project_id: int
     description: str
+
+    

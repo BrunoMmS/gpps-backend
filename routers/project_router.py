@@ -76,6 +76,13 @@ def get_project_with_user(idProject: int, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@project_router.get("/getProjectsWithUser/{idUser}", response_model = list[ProjectWithUser])
+def get_projects_with_user(idUser: int, db: Session = Depends(get_db)):
+    try:
+        return project_service.get_projects_with_user(db, idUser)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 """
 @project_router.get("/with-creators", response_model=list[ProjectWithCreator])
 def list_projects_with_creators(db: Session = Depends(get_db)):
