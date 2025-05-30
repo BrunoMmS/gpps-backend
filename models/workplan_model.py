@@ -8,6 +8,7 @@ class WorkPlan(BaseDBModel):
     id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("proyectos_pps.id"), nullable=False)
     description = Column(String, nullable=False)
+    duration_estimate = Column(Integer, index=True)
     project = relationship(
         "ProjectModel",
         back_populates="workplan"

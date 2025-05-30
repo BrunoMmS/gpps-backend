@@ -2,11 +2,14 @@ from entities.activity_entity import ActivityEntity
 from entities.project_entity import ProjectEntity
 
 class WorkplanEntity:
-    def __init__(self, id: int, project: ProjectEntity, description: str = "", activities: list[ActivityEntity] = []):
+    def __init__(self, id: int, project: ProjectEntity, duration_estimate: int ,description: str = "", activities: list[ActivityEntity] = []):
         self.__id: int = id
         self.__project: ProjectEntity = project
         self.__description: str = description
         self.__activities: list[ActivityEntity] = activities
+        if  duration_estimate > 200:
+            raise ValueError("La duracion estimada total debe ser menor a 200.")
+        self.__duration_estimate: int = duration_estimate
 
     
     def addActivity(self, activity: ActivityEntity) -> None:

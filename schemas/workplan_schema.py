@@ -4,6 +4,7 @@ from typing import Optional
 
 class WorkPlan(BaseModel):
     id: int
+    duration_estimate: int
     project_id: int
     description: str
     activities: Optional[list[Activitie]] = []
@@ -13,5 +14,6 @@ class WorkPlan(BaseModel):
 class WorkPlanCreate(BaseModel):
     project_id: int
     description: str
+    duration_estimate: int
 
     
