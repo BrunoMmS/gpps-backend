@@ -163,6 +163,25 @@ class ProjectService:
         ))
         
         return projects_schemas
+    
+    def get_all_projects_with_user(self, db: Session) -> list[ProjectWithUser]:
+        projects = self.project_dao.list(db)
+        projects_schemas: list[ProjectWithUser] = []
+
+        for project in projects:
+            user = self.user_service.get_user_by_id(db, project.user_id)
+            if user:
+                projects_schemas.append(ProjectWithUser(
+                    id=project.id,
+                    title=project.title,
+                    description=project.description,
+                    active=project.active,
+                    start_date=project.start_date,
+                    end_date=project.end_date,
+                    user=user
+                ))
+        
+        return projects_schemas
             
 
 
