@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routers.uploader_router import uploader_router
 from external_services.mailtrap_controller import mailtrap_router
 from routers.activity_router import activity_router
 from routers.workplan_router import workplan_router
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 #Register the user router
+app.include_router(uploader_router)
 app.include_router(user_router)
 app.include_router(project_router)
 app.include_router(workplan_router)
