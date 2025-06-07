@@ -14,11 +14,20 @@ class ActivityEntity:
             raise TypeError("Debe ser una Tarea")
         self.__jobs.append(task)
 
+    def getJobs(self)-> list[TaskEntity]:
+        return self.__jobs
+
+    def getDuration(self)->int:
+        return self.__duration
+
     def searchTask(self, idTask: int) -> TaskEntity | None:
         return next((task for task in self.__jobs if task.getId() == idTask), None)
 
     def getId(self) -> int:
         return self.__id
+
+    def getName(self) -> str:
+        return self.__name
     
     def changeName(self, name: str) -> None:
         self.__name = name

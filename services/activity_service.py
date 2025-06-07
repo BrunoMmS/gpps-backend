@@ -6,12 +6,15 @@ from schemas.activity_schema import ActivitieCreate
 from schemas.task_schema import TaskCreate
 from models.activity_model import ActivityModel
 from models.task_model import TaskModel
+from entities.activity_entity import ActivityEntity
+from services.task_service import TaskService
 
 class ActivityService:
     def __init__(self):
         self.activity_dao = ActivityDAO()
         self.workplan_dao = WorkPlanDAO()
         self.tasks_dao = TaskDAO()
+        self.tasks_service= TaskService()
 
     def is_complete(self, db: Session, activity_id: int) -> bool:
         activity = self.activity_dao.get_by_id(db, activity_id)
@@ -36,6 +39,22 @@ class ActivityService:
 
         task = self.tasks_dao.create(db, new_task_data, activity_id)
         return task
+    
+    def activity_to_entity(self, activity_model: ActivityModel) -> ActivityEntity:
+        if activity_model is None:
+            return None
+        task_entities = []
+        if activity_model.tasks:  
+            task_entities = [
+                self.tasks_service.task_to_entity(task_model)
+                for task_model in activity_model.tasks
+            ]
 
-        
+        return ActivityEntity(
+            id=activity_model.id,
+            name=activity_model.name,
+            duration=activity_model.duration,
+            done=activity_model.done,
+            jobs=task_entities
+        )
 

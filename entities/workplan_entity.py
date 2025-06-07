@@ -10,8 +10,9 @@ class WorkplanEntity:
         if  duration_estimate > 200:
             raise ValueError("La duracion estimada total debe ser menor a 200.")
         self.__duration_estimate: int = duration_estimate
-
     
+    def getDuration(self)->int:
+        return self.__duration_estimate
     def addActivity(self, activity: ActivityEntity) -> None:
         if not isinstance(activity, ActivityEntity):
             raise TypeError("Debe ser una Actividad")
@@ -31,7 +32,7 @@ class WorkplanEntity:
     def get_completed_percent(self) -> float:
         if not self.__activities:
             raise ValueError("No hay actividades en el plan de trabajo")
-        completed_activities = sum(1 for activity in self.__activities if activity.isDone())
+        completed_activities = sum(1 for activity in self.__activities if activity.isFinished())
         return (completed_activities / len(self.__activities)) * 100
     
     def get_incopmlete_percent(self) -> float:

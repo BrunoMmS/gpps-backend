@@ -1,4 +1,6 @@
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from schemas.workplan_schema import WorkPlan, WorkPlanCreate
 from services.project_service import ProjectService
@@ -82,6 +84,19 @@ def get_projects_with_user(idUser: int, db: Session = Depends(get_db)):
         return project_service.get_projects_with_user(db, idUser)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+
+@project_router.post("/project/getReportWithId/{idProject}", response_class=PlainTextResponse)
+def get_report_with_id(idProject: int, db: Session = Depends(get_db)):
+    try:
+        report = project_service.get_report_project(db, idProject)
+        if not report:
+            raise HTTPException(status_code=404, detail="Projecto no encontrado")
+        return report
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 """
 @project_router.get("/with-creators", response_model=list[ProjectWithCreator])
