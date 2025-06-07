@@ -1,7 +1,7 @@
 from datetime import date
 
 from entities.user_entity import UserEntity
-from services.rol import Rol
+from roles.rol import Rol
 
 class ProjectEntity:
     def __init__(self, id: int, title: str, description: str,

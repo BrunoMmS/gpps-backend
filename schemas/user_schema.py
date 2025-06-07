@@ -1,12 +1,12 @@
 from pydantic import BaseModel
-#from services.rol import Rol
+from roles.rol import Rol
 
 class User(BaseModel):
     id : int
     username: str
     lastname: str
     email: str
-    role: str
+    role: Rol
     class Config:
         from_attributes = True
 

@@ -1,7 +1,9 @@
 # models/user.py
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import Enum as SQLEnum
 from db.db import BaseDBModel
+from roles.rol import Rol
 
 class UserModel(BaseDBModel):
     __tablename__ = "Usuarios"
@@ -11,7 +13,7 @@ class UserModel(BaseDBModel):
     lastname = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
-    role = Column(String, nullable=False)
+    role = Column(SQLEnum(Rol, values_callable=lambda x: [e.value for e in x]), default=Rol.student.value, nullable=False)
     created_projects = relationship("ProjectModel", back_populates="creator")
 
     projects = relationship(
