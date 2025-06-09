@@ -1,6 +1,6 @@
 from entities.project_entity import ProjectEntity
 from entities.user_entity import UserEntity
-from services.rol import Rol
+from roles.rol import Rol
 
 class UserInProjectEntity:
     def __init__(self, user_entity: UserEntity, project_entity: ProjectEntity, id: int = None):

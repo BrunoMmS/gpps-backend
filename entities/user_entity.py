@@ -1,10 +1,10 @@
 import re
 
-from services.rol import Rol
+from roles.rol import Rol
 
 class UserEntity:
     def __init__(self, id: int, username: str, password: str, lastname: str, 
-                 email: str, role: str):
+                 email: str, role: Rol):
         if not isinstance(id, int) or id < 0:
             raise ValueError("ID debe ser un entero positivo.")
 
@@ -17,7 +17,7 @@ class UserEntity:
         if not self.__is_valid_email(email):
             raise ValueError("El email no tiene un formato válido.")
 
-        if role not in [Rol.admin, Rol.student, Rol.teacher, Rol.teacher2, Rol.exEntity]:
+        if role not in [Rol.admin, Rol.student, Rol.inteacher, Rol.exteacher, Rol.exEntity]:
             raise ValueError(f"Rol inválido: {role}")
         
         self.__password : str = password

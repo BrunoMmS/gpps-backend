@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from cruds.workplanDAO import WorkPlanDAO
 from schemas.workplan_schema import WorkPlanCreate
-from services.rol import Rol
+from roles.rol import Rol
 from services.user_service import UserService
 
 class WorkPlanService:
@@ -15,7 +15,7 @@ class WorkPlanService:
             raise ValueError("Usuario no encontrado")
         
         userEntity = self.user_service.to_entity(user)
-        if userEntity.getRole() not in [Rol.student, Rol.teacher2]:
+        if userEntity.getRole() not in [Rol.student, Rol.exteacher]:
             raise ValueError("El usuario no tiene permisos para crear un plan de trabajo")
         
         return self.workplan_dao.create(db, workplan_data)

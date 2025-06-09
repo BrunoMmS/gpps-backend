@@ -4,7 +4,7 @@ from schemas.user_schema import UserCreate, UserLogin, User
 from entities.user_entity import UserEntity
 from models.user_model import UserModel
 from entities.project_entity import ProjectEntity
-from services.rol import Rol 
+from roles.rol import Rol
 
 class UserService:
     def __init__(self):
@@ -70,11 +70,11 @@ class UserService:
      
     def add_tutor(self, user_entity: UserEntity, project: ProjectEntity, tutor: UserEntity) -> None:
         # CORREGIDO - Use 'and' en lugar de 'or'
-        if user_entity.role != Rol.admin and user_entity.role != Rol.exEntity:
+        if user_entity.getRole() != Rol.admin and user_entity.getRole() != Rol.exEntity:
             raise ValueError("No tienes permisos para agregar un tutor")
         
         # CORREGIDO - Use 'and' en lugar de 'or'
-        if tutor.role != Rol.teacher and tutor.role != Rol.teacher2:
+        if tutor.getRole() != Rol.inteacher and tutor.getRole() != Rol.exteacher:
             raise ValueError("No estas agregando un tutor")
         
         if project.tutor_id is not None:
@@ -84,7 +84,7 @@ class UserService:
 
     def project_aprove(self, user_entity: UserEntity, project: ProjectEntity) -> ProjectEntity:
         # CORREGIDO - Use la constante de Rol en lugar de string
-        if user_entity.role != Rol.admin:
+        if user_entity.getRole() != Rol.admin:
             raise ValueError("No tienes permisos para aprobar un proyecto")
         
         if project.active:
