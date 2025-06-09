@@ -7,7 +7,7 @@ from routers.workplan_router import workplan_router
 from routers.user_router import user_router
 from routers.project_router import project_router
 from routers.notification_router import notification_router
-
+from routers.report_router import report_router
 from db.db import BaseDBModel
 
 
@@ -29,3 +29,4 @@ app.include_router(workplan_router)
 app.include_router(activity_router)
 app.include_router(mailtrap_router)
 app.include_router(notification_router)
+app.include_router(report_router)

@@ -11,8 +11,12 @@ class WorkplanEntity:
             raise ValueError("La duracion estimada total debe ser menor a 200.")
         self.__duration_estimate: int = duration_estimate
     
-    def getDuration(self)->int:
+    def getDuration(self) -> int:
         return self.__duration_estimate
+    
+    def getActivities(self) -> list[ActivityEntity]:
+        return self.__activities
+
     def addActivity(self, activity: ActivityEntity) -> None:
         if not isinstance(activity, ActivityEntity):
             raise TypeError("Debe ser una Actividad")

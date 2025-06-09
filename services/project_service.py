@@ -162,45 +162,6 @@ class ProjectService:
         ))
         
         return projects_schemas
-    def get_report_project(self, db: Session, proyect_id: int) -> Optional[str]:
-       project_model = self.project_dao.get_proyect_complete(db, proyect_id)
-       if not project_model:
-        raise ValueError("Proyecto no encontrado")
-
-       report_lines = []
-
-       report_lines.append(f"Proyecto: {project_model.title}")
-       report_lines.append(f"Descripción: {project_model.description}")
-       report_lines.append(f"Activo: {'Sí' if project_model.active else 'No'}")
-       report_lines.append(f"Fecha de inicio: {project_model.start_date}")
-       report_lines.append(f"Fecha de fin: {project_model.end_date if project_model.end_date else 'No definida'}")
-       report_lines.append("")
-       workplan= self.workplan_service.workplan_to_entity(project_model.workplan,self.proyect_to_entity(project_model))
-       
-       if workplan:
-           report_lines.append(f"Workplan:")
-           report_lines.append(f"Descripción: {workplan.getDescription()}")
-           report_lines.append(f"Duracion estimada: {workplan.getDuration()}")
-           report_lines.append(f"Porcentaje de actividades hechas: {workplan.get_completed_percent()}")
-           report_lines.append(f"Porcentaje de no actividades hechas: {workplan.get_incopmlete_percent()}")
-           for activity_model in project_model.workplan.activities:
-               activity_entity = self.activity_service.activity_to_entity(activity_model)
-               report_lines.append(f"    - Actividad: {activity_entity.getName()}")
-               report_lines.append(f"      Duración: {activity_entity.getDuration()}")
-               report_lines.append(f"      Completada: {'Sí' if activity_entity.isFinished() else 'No'}")
-               report_lines.append(f"      Porcentaje de tareas hechas:{activity_entity.get_complete_percent()}")
-               report_lines.append(f"      Porcentaje de tareas hechas:{activity_entity.get_incomplete_percent()}")
-               if activity_entity.getJobs():
-                   report_lines.append("      Tareas:")
-                   for task in activity_entity.getJobs():
-                       report_lines.append(f"        * {task.getDescription()} - {'Completada' if task.isDone() else 'Pendiente'}")
-               else:
-                  report_lines.append("No tiene tareas.")
-                
-               report_lines.append("") 
-       else:
-           report_lines.append(f"No hay proyecto definido")
-       return "\n".join(report_lines)       
 
     def proyect_to_entity(self, proyect_model: ProyectComplete) -> ProjectEntity:
         user_entity = None
