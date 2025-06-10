@@ -21,6 +21,8 @@ class ProjectModel(BaseDBModel):
         back_populates="project",
         cascade="all, delete-orphan"
     )
+    
+    agreements = relationship("AgreementModel", back_populates="project")
 
     workplan = relationship(
         "WorkPlan",

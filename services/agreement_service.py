@@ -7,26 +7,30 @@ from schemas.agreements_schema import AgreementCreate, AgreementUpdate, Agreemen
 from models.agreement_model import AgreementModel
 from models.project_model import ProjectModel
 from schemas.project_schema import Project
+from services.user_service import UserService
 
 class AgreementService:
     def __init__(self):
         self.dao = AgreementDAO()
-    
-    def create_agreement(self, db: Session, data: AgreementCreate) -> Agreement:
-        #Crea un nuevo convenio
+        self.user_service = UserService()
+
+        
+    def create_agreement(self, db: Session, data: AgreementCreate) -> AgreementModel:
+        """Crea un nuevo convenio"""
         try:
             agreement_entity = AgreementEntity(
                 id=None,
                 start_date=data.start_date,
                 end_date=data.end_date,
-                user_id=getattr(data, 'user_id', None)  # Manejar user_id opcional
+                external_entity= self.user_service.to_entity(self.user_service.get_user_by_id(db, data.user_id))
             )
             created_model = self.dao.create(db, agreement_entity)
             return self._model_to_schema(created_model)
         except Exception as e:
             raise ValueError(f"Error creating agreement: {e}")
+        
 
-    def update_agreement(self, db: Session, agreement_id: int, data: AgreementUpdate) -> Agreement:
+    def update_agreement(self, db: Session, agreement_id: int, data: AgreementUpdate) -> AgreementModel:
         """Actualiza un convenio existente"""
         try:
             existing_model = self.dao.get_by_id(db, agreement_id)
@@ -37,13 +41,15 @@ class AgreementService:
             
             if data.start_date is not None and data.end_date is not None:
                 agreement_entity.update_dates(data.start_date, data.end_date)
-            elif data.start_date is not None or data.end_date is not None:
-                start_date = data.start_date if data.start_date is not None else agreement_entity.get_start_date()
-                end_date = data.end_date if data.end_date is not None else agreement_entity.get_end_date()
-                agreement_entity.update_dates(start_date, end_date)
             
             if data.status is not None:
                 agreement_entity.update_status(AgreementStatus(data.status))
+            
+            if data.external_entity_id is not None:
+                agreement_entity.external_entity = UserEntity(id=data.external_entity_id)
+                
+            if data.project is not None:
+                agreement_entity.project = data.project   
             
             updated_model = self.dao.update(db, agreement_entity)
             return self._model_to_schema(updated_model)

@@ -20,7 +20,6 @@ class ProjectService:
         self.workplan_service = WorkPlanService()
         self.user_service = UserService()
         
-
     def create_project(self, db: Session, project_data: ProjectCreate) -> ProjectModel:
         user = self.user_service.get_user_by_id(db, project_data.user_id)
         

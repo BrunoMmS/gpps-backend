@@ -19,3 +19,5 @@ class UserModel(BaseDBModel):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+    
+    agreements = relationship("AgreementModel", back_populates="user")

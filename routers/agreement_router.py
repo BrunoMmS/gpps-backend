@@ -112,7 +112,7 @@ def update_agreement(agreement_id: int, update_data: AgreementUpdate,
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                           detail="Error interno del servidor")
 
-@agreement_router.delete("/{agreement_id}", status_code=status.HTTP_204_NO_CONTENT, 
+@agreement_router.delete("/{agreement_id}", response_model=dict, 
                         summary="Eliminar convenio", description="Elimina un convenio del sistema")
 def delete_agreement(agreement_id: int, db: Session = Depends(get_db)) -> None:
     """Elimina un convenio"""
@@ -144,11 +144,12 @@ def approve_agreement(agreement_id: int, approved_by_id: Optional[int] = Query(N
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                           detail="Error interno del servidor")
 
+"""
 @agreement_router.patch("/{agreement_id}/reject", response_model=Agreement, 
                        summary="Rechazar convenio", description="Rechaza un convenio pendiente")
 def reject_agreement(agreement_id: int, rejection_reason: Optional[str] = Query(None), 
                     db: Session = Depends(get_db)) -> Agreement:
-    """Rechaza un convenio"""
+    #Rechaza un convenio
     try:
         rejected_agreement = agreement_service.reject_agreement(db, agreement_id, rejection_reason)
         return rejected_agreement
@@ -160,6 +161,7 @@ def reject_agreement(agreement_id: int, rejection_reason: Optional[str] = Query(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                           detail="Error interno del servidor")
+"""
 
 @agreement_router.patch("/{agreement_id}/deactivate", status_code=status.HTTP_204_NO_CONTENT,
                        summary="Desactivar convenio", description="Desactiva un convenio activo")
