@@ -123,10 +123,3 @@ class AgreementDAO:
             db.rollback()
             raise ValueError(f"No se pudo asignar el proyecto con ID {project_id} al convenio {agreement_id}: {e}")
     
-    #def get_projects(self, db: Session, agreement_id: int) -> List:
-    #    """Obtiene proyectos asociados a un convenio"""
-    #    try:
-    #        from models.project_model import ProjectModel
-    #        return db.query(ProjectModel).filter(ProjectModel.agreement_id == agreement_id).all()
-    #    except Exception as e:
-    #        raise ValueError(f"No se pudieron obtener los proyectos del convenio con ID {agreement_id}: {e}")

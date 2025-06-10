@@ -8,11 +8,14 @@ from models.agreement_model import AgreementModel
 from models.project_model import ProjectModel
 from schemas.project_schema import Project
 from services.user_service import UserService
+from services.project_service import ProjectService
+from schemas.project_schema import ProyectComplete
 
 class AgreementService:
     def __init__(self):
         self.dao = AgreementDAO()
         self.user_service = UserService()
+        self.proyect_service= ProjectService()
 
         
     def create_agreement(self, db: Session, data: AgreementCreate) -> AgreementModel:
@@ -45,11 +48,11 @@ class AgreementService:
             if data.status is not None:
                 agreement_entity.update_status(AgreementStatus(data.status))
             
-            if data.external_entity_id is not None:
-                agreement_entity.external_entity = UserEntity(id=data.external_entity_id)
+            if data.user_id is not None:
+                agreement_entity._external_entity = UserEntity(id=data.user_id)
                 
             if data.project is not None:
-                agreement_entity.project = data.project   
+                agreement_entity._project = data.project   
             
             updated_model = self.dao.update(db, agreement_entity)
             return self._model_to_schema(updated_model)
@@ -74,14 +77,6 @@ class AgreementService:
         except Exception as e:
             raise ValueError(f"Error listing agreements: {e}")
 
-    def list_active_agreements(self, db: Session) -> List[Agreement]:
-        """Lista convenios vigentes (current=True)"""
-        try:
-            models = self.dao.get_current_agreements(db)
-            return [self._model_to_schema(model) for model in models]
-        except Exception as e:
-            raise ValueError(f"Error listing active agreements: {e}")
-
     def list_pending_agreements(self, db: Session) -> List[Agreement]:
         """Lista convenios pendientes de aprobación"""
         try:
@@ -89,14 +84,6 @@ class AgreementService:
             return [self._model_to_schema(model) for model in models]
         except Exception as e:
             raise ValueError(f"Error listing pending agreements: {e}")
-    
-    def list_agreements_by_external_entity(self, db: Session, entity_id: int) -> List[Agreement]:
-        """Lista convenios por entidad externa"""
-        try:
-            models = self.dao.get_by_external_entity(db, entity_id)
-            return [self._model_to_schema(model) for model in models]
-        except Exception as e:
-            raise ValueError(f"Error listing agreements by external entity {entity_id}: {e}")
     
     def delete_agreement(self, db: Session, agreement_id: int) -> bool:
         """Elimina un convenio"""
@@ -125,10 +112,17 @@ class AgreementService:
     def approve_agreement(self, db: Session, agreement_id: int, approved_by_id: Optional[int] = None) -> Agreement:
         """Aprueba un convenio"""
         try:
+            user= self.user_service.get_user_by_id(approved_by_id)
+            if not user:
+                raise ValueError(f"El usuario no existe y por lo tanto no se puede aprobar el convenio")
+            
+            user_entity= self.user_service.to_entity(user)
+            if user_entity.getRole != "Administrator":
+                raise ValueError(f"El usuario no tiene los permisos para aprobar el convenio")
+            
             existing_model = self.dao.get_by_id(db, agreement_id)
             if not existing_model:
                 raise ValueError(f"Convenio con ID {agreement_id} no encontrado")
-            
             agreement_entity = self._model_to_entity(existing_model)
             
             if agreement_entity.get_status() != AgreementStatus.PENDING:
@@ -141,13 +135,20 @@ class AgreementService:
         except Exception as e:
             raise ValueError(f"Error approving agreement {agreement_id}: {e}")
     
-    def reject_agreement(self, db: Session, agreement_id: int, rejection_reason: Optional[str] = None) -> Agreement:
+    def reject_agreement(self, db: Session, agreement_id: int, rejected_by_id: Optional[int] = None) -> Agreement:
         """Rechaza un convenio"""
         try:
+            user= self.user_service.get_user_by_id(rejected_by_id)
+            if not user:
+                raise ValueError(f"El usuario no existe y por lo tanto no se puede rechazar el convenio")
+            user_entity= self.user_service.to_entity(user)
+        
+            if user_entity.getRole != "Administrator":
+                raise ValueError(f"El usuario no tiene los permisos para aprobar el convenio")
+            
             existing_model = self.dao.get_by_id(db, agreement_id)
             if not existing_model:
                 raise ValueError(f"Convenio con ID {agreement_id} no encontrado")
-
             agreement_entity = self._model_to_entity(existing_model)
             
             if agreement_entity.get_status() != AgreementStatus.PENDING:
@@ -172,11 +173,12 @@ class AgreementService:
         except Exception as e:
             raise ValueError(f"Error assigning external representative: {e}")
 
-    def get_projects_for_agreement(self, db: Session, agreement_id: int) -> List[Project]:
+    def get_project_for_agreement(self, db: Session, agreement_id: int) -> ProyectComplete:
         """Obtiene proyectos asociados a un convenio"""
         try:
-            project_models: List[ProjectModel] = self.dao.get_projects(db, agreement_id)
-            return [Project.model_validate(p) for p in project_models]
+            agreement = self.dao.get_by_id(db, agreement_id)
+            project_complete= self.proyect_service.get_complete_project(db,agreement.project_id)
+            return project_complete
         except Exception as e:
             raise ValueError(f"Error getting projects for agreement {agreement_id}: {e}")
     
@@ -186,7 +188,6 @@ class AgreementService:
             id=model.id,
             start_date=model.start_date,
             end_date=model.end_date,
-            current=model.current,
             status=model.status,
             external_entity=None,  # Se puede expandir para incluir datos del usuario
             project=None  # Se puede expandir para incluir datos del proyecto

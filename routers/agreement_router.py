@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from db.db import SessionLocal
 from schemas.agreements_schema import Agreement, AgreementCreate, AgreementUpdate
+from schemas.project_schema import ProyectComplete
 from services.agreement_service import AgreementService
 
 agreement_router = APIRouter(prefix="/agreements", tags=["agreements"])
@@ -49,16 +50,6 @@ def list_all_agreements(db: Session = Depends(get_db)) -> List[Agreement]:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                           detail="Error interno del servidor")
 
-@agreement_router.get("/active", response_model=List[Agreement], 
-                     summary="Listar convenios activos", description="Obtiene convenios que están actualmente vigentes")
-def list_active_agreements(db: Session = Depends(get_db)) -> List[Agreement]:
-    """Lista convenios activos"""
-    try:
-        active_agreements = agreement_service.list_active_agreements(db)
-        return active_agreements
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                          detail="Error interno del servidor")
 
 @agreement_router.get("/pending", response_model=List[Agreement], 
                      summary="Listar convenios pendientes", description="Obtiene convenios pendientes de aprobación")
@@ -71,19 +62,6 @@ def list_pending_agreements(db: Session = Depends(get_db)) -> List[Agreement]:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                           detail="Error interno del servidor")
 
-@agreement_router.get("/by-external-entity/{entity_id}", response_model=List[Agreement], 
-                     summary="Listar convenios por entidad externa", 
-                     description="Obtiene convenios asociados a una entidad externa específica")
-def list_agreements_by_external_entity(entity_id: int, db: Session = Depends(get_db)) -> List[Agreement]:
-    """Lista convenios por entidad externa"""
-    try:
-        entity_agreements = agreement_service.list_agreements_by_external_entity(db, entity_id)
-        return entity_agreements
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                          detail="Error interno del servidor")
 
 @agreement_router.get("/{agreement_id}", response_model=Agreement, 
                      summary="Obtener convenio por ID", description="Obtiene un convenio específico por su ID")
@@ -143,6 +121,20 @@ def approve_agreement(agreement_id: int, approved_by_id: Optional[int] = Query(N
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                           detail="Error interno del servidor")
+
+@agreement_router.get("/{agreement_id}", response_model=ProyectComplete, 
+                     summary="Obtener proyecto por ID del convenio", description="Obtiene el proyecto completo por el id del convenio")
+def get_agreement_by_id(agreement_id: int, db: Session = Depends(get_db)) -> Agreement:
+    """Obtiene un convenio por ID"""
+    try:
+        agreement = agreement_service.get_project_for_agreement(db, agreement_id)
+        return agreement
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                          detail="Error interno del servidor")
+
 
 """
 @agreement_router.patch("/{agreement_id}/reject", response_model=Agreement, 
