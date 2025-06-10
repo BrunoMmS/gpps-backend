@@ -5,9 +5,9 @@ from services.workplan_service import WorkPlanService
 
 
 class ReportService:
-    def __init__(self, workplan_service: WorkPlanService, project_service: ProjectService):
-        self.workplan_service = workplan_service
-        self.project_service = project_service
+    def __init__(self):
+        self.workplan_service = WorkPlanService()
+        self.project_service = ProjectService()
 
     def generate_project_report(self, db: Session, proyect_id: int) -> str:
         proyect_model = self.project_service.project_dao.get_proyect_complete(db, proyect_id)

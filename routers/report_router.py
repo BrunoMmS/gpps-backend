@@ -4,14 +4,10 @@ from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from db.db import SessionLocal
 from services.report_services import ReportService
-from services.project_service import ProjectService
-from services.workplan_service import WorkPlanService
 
 report_router = APIRouter(prefix="/report", tags=["report"])
 
-project_service = ProjectService()
-workplan_service = WorkPlanService()
-report_service = ReportService(workplan_service, project_service)
+report_service = ReportService()
 
 def get_db():
     db = SessionLocal()
