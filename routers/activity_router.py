@@ -17,7 +17,7 @@ def get_db():
         db.close()
 
 
-@activity_router.post("/create")
+@activity_router.post("/create", response_model=Activitie)
 def create_activity(
     workplan_id: int,
     activity_data: ActivitieCreate,

@@ -10,7 +10,7 @@ from schemas.project_schema import ProjectCreate, ProyectComplete, ProjectWithUs
 from schemas.workplan_schema import WorkPlanCreate
 from models.project_model import ProjectModel
 from services.notification_service import NotificationService
-from services.rol import Rol
+from roles.rol import Rol
 from services.user_service import UserService
 from services.workplan_service import WorkPlanService
 
