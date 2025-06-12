@@ -3,7 +3,7 @@
 - python -m venv venv
 
 ## Activar el entorno virtual
-- venv/Scripts/activate 
+- venv/Scripts/activate
 
 ## Instalar fastapi:
 - pip install -r requirements.txt

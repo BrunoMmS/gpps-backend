@@ -1,27 +1,31 @@
-# modelo de Convenios
-from datetime import date
 from pydantic import BaseModel
-from schemas.project_schema import Project
+from datetime import date
+from typing import Optional
+from entities.agreement_entity import AgreementStatus  # Enum definido
 
 class Agreement(BaseModel):
     id: int
     start_date: date
     end_date: date
-    current: bool #true --> convenio vigente
-    projects: list[Project]
-    #firm1: exEntity/student
+    current: Optional[bool] = None
+    created_by: Optional[int]  # Nuevo campo agregado
+    user_id: Optional[int]
+    project_id: Optional[int]
+    status: AgreementStatus
 
-class AgreementCreate(Agreement):
+class AgreementResponse(Agreement):
     pass
 
-class AgreementUpdate(Agreement):
-    current: bool | None = None
-    reasonRejection: str | None = None
+class AgreementCreate(BaseModel):
+    start_date: date
+    end_date: date
+    user_id: Optional[int] = None
 
-class Agreement(Agreement):
-    id: int
-    current: bool | None = None
-    reasonRejection: str | None = None
+class AgreementUpdate(BaseModel):
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    status: Optional[AgreementStatus] = None
+    project_id: Optional[int] = None
 
-    class Config:
-        from_attributes = True
+class AgreementApproval(BaseModel):
+    status: AgreementStatus
