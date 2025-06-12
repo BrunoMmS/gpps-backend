@@ -19,6 +19,7 @@ class AgreementEntity:
         start_date: date,
         end_date: date,
         id: Optional[int] = None,
+        created_by: Optional[int] = None,
         user_id: Optional[int] = None,
         project_id: Optional[int] = None,
         status: AgreementStatus = AgreementStatus.PENDING,
@@ -27,6 +28,7 @@ class AgreementEntity:
         self._id = id
         self._start_date = start_date
         self._end_date = end_date
+        self._created_by = created_by
         self.user_id = user_id    
         self._project_id = project_id
         self._status = status
@@ -45,6 +47,10 @@ class AgreementEntity:
     @property
     def get_end_date(self) -> date:
         return self._end_date
+
+    @property
+    def get_created_by(self) -> Optional[int]:
+        return self._created_by
 
     @property
     def get_user_id(self) -> Optional[int]:
@@ -86,7 +92,7 @@ class AgreementEntity:
     def to_expire(self) -> None:
         if self.is_expired and self._status not in [AgreementStatus.EXPIRED]:
             self._status = AgreementStatus.EXPIRED
-        
+
     def assign_user_id(self, user: UserEntity) -> None:
         self._validate_user(user)
         self.user_id = user.getId()
@@ -106,7 +112,7 @@ class AgreementEntity:
         self._validate_user(user)
 
     def _validate_user(self, user):
-        #valida que el usuario tenga rol correcto
+        # valida que el usuario tenga rol correcto
         if user.getRole() not in ["Administrator", "ExternalEntity"]:
             raise ValueError("No tienes el permiso para realizar esta accion en convenios.")
 

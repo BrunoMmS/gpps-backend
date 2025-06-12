@@ -7,7 +7,7 @@ from schemas.project_schema import ProyectComplete
 from models.agreement_model import AgreementModel
 from services.user_service import UserService
 from services.project_service import ProjectService
-from services.rol import Rol
+from roles.rol import Rol
 from services.notification_service import NotificationService
 
 
@@ -23,21 +23,25 @@ class AgreementService:
     # =====================================================
 
     def create_agreement(self, db: Session, data: AgreementCreate, creator_id: int) -> AgreementResponse:
-        # Crea un nuevo convenio. Solo pueden crear convenios: Administradores y Entidades Externas
+        creator_entity = self._get_user_entity(db, creator_id)
+        assigned_entity = None
 
-        creator = self._get_and_validate_user(db, creator_id)
-        self._validate_permissions(creator)
+        if data.user_id and data.user_id != creator_id:
+            assigned_entity = self._get_user_entity(db, data.user_id)
+            self._validate_assignment_roles(creator_entity, assigned_entity)
+
+        self._validate_creation_roles(creator_entity, assigned_entity)
 
         agreement_entity = AgreementEntity(
             start_date=data.start_date,
             end_date=data.end_date,
+            created_by=creator_id,
             user_id=data.user_id,
             status=AgreementStatus.PENDING
         )
 
-        if data.user_id:
-            user = self._get_and_validate_user(db, data.user_id)
-            agreement_entity.assign_user_id(self._user_to_entity(user))
+        if assigned_entity:
+            agreement_entity.assign_user_id(assigned_entity)
 
         db_agreement = self.agreement_dao.create(db, agreement_entity)
 
@@ -47,8 +51,6 @@ class AgreementService:
         return self._model_to_schema(db_agreement)
 
     def update_agreement(self, db: Session, agreement_id: int, data: AgreementUpdate, updater_id: int) -> AgreementResponse:
-        # Actualiza un convenio existente
-
         updater = self._get_and_validate_user(db, updater_id)
         self._validate_admin_permissions(updater, "actualizar convenios")
 
@@ -63,49 +65,31 @@ class AgreementService:
             agreement_entity.update_status(data.status)
 
         if data.user_id:
-            user = self._get_and_validate_user(db, data.user_id)
-            agreement_entity.assign_user_id(self._user_to_entity(user))
+            user_entity = self._get_user_entity(db, data.user_id)
+            self._validate_assignment_roles(self._user_to_entity(updater), user_entity, db_agreement.created_by, updater_id)
+            agreement_entity.assign_user_id(user_entity)
 
         if data.project_id:
-            try:
-                self.project_service.get_project_with_user(db, data.project_id)
-            except ValueError:
-                raise ValueError(f"El proyecto con ID {data.project_id} no existe")
+            self._validate_project_exists(db, data.project_id)
 
         updated_agreement = self.agreement_dao.update(db, agreement_entity)
         return self._model_to_schema(updated_agreement)
 
     def approve_agreement(self, db: Session, agreement_id: int, approved_by_id: int) -> AgreementResponse:
-        # Aprueba un convenio
-        user = self._get_and_validate_user(db, approved_by_id)
-        return self._change_agreement_status(db, agreement_id, self._user_to_entity(user), "approve")
+        user_entity = self._get_user_entity(db, approved_by_id)
+        return self._change_agreement_status(db, agreement_id, user_entity, "approve")
 
     def reject_agreement(self, db: Session, agreement_id: int, rejected_by_id: int) -> AgreementResponse:
-        # Rechaza un convenio
-        user = self._get_and_validate_user(db, rejected_by_id)
-        return self._change_agreement_status(db, agreement_id, self._user_to_entity(user), "reject")
+        user_entity = self._get_user_entity(db, rejected_by_id)
+        return self._change_agreement_status(db, agreement_id, user_entity, "reject")
 
     def assign_user_to_agreement(self, db: Session, agreement_id: int, user_id: int, assigner_id: int) -> AgreementResponse:
-        # Permite asignar un usuario a un convenio bajo la siguiente regla:
-        # Si el asignador es ADMINISTRADOR, puede asignar una ENTIDAD EXTERNA.
-        # Si el asignador es ENTIDAD EXTERNA, puede asignar un ADMINISTRADOR.
-
-        assigner = self._get_and_validate_user(db, assigner_id)
-        assigner_entity = self._user_to_entity(assigner)
-
-        user = self._get_and_validate_user(db, user_id)
-        user_entity = self._user_to_entity(user)
-
-        if assigner_entity.getRole() == Rol.admin:
-            if user_entity.getRole() != Rol.exEntity:
-                raise ValueError("Un administrador solo puede asignar una entidad externa al convenio.")
-        elif assigner_entity.getRole() == Rol.exEntity:
-            if user_entity.getRole() != Rol.admin:
-                raise ValueError("Una entidad externa solo puede asignar un administrador al convenio.")
-        else:
-            raise ValueError("No tienes permisos para asignar usuarios a convenios.")
+        assigner_entity = self._get_user_entity(db, assigner_id)
+        user_entity = self._get_user_entity(db, user_id)
 
         db_agreement = self._get_agreement_or_raise(db, agreement_id)
+        self._validate_assignment_roles(assigner_entity, user_entity, db_agreement.created_by, assigner_id)
+
         agreement_entity = self._model_to_entity(db_agreement)
         agreement_entity.assign_user_id(user_entity)
 
@@ -114,15 +98,10 @@ class AgreementService:
         return self._model_to_schema(updated_agreement)
 
     def assign_project_to_agreement(self, db: Session, agreement_id: int, project_id: int, assigner_id: int) -> AgreementResponse:
-        # Asigna un proyecto a un convenio
-
         assigner = self._get_and_validate_user(db, assigner_id)
         self._validate_admin_permissions(assigner, "asignar proyectos a convenios")
 
-        try:
-            self.project_service.get_project_with_user(db, project_id)
-        except ValueError:
-            raise ValueError(f"El proyecto con ID {project_id} no existe")
+        self._validate_project_exists(db, project_id)
 
         updated_agreement = self.agreement_dao.assign_project(db, agreement_id, project_id)
         if not updated_agreement:
@@ -131,43 +110,52 @@ class AgreementService:
         return self._model_to_schema(updated_agreement)
 
     def delete_agreement(self, db: Session, agreement_id: int, deleter_id: int) -> bool:
-        # Elimina un convenio
-
         deleter = self._get_and_validate_user(db, deleter_id)
         self._validate_admin_permissions(deleter, "eliminar convenios")
 
-        return self.agreement_dao.delete(db, agreement_id)
+        success = self.agreement_dao.delete(db, agreement_id)
+        if not success:
+            raise ValueError("No se encontró el convenio para eliminar.")
+        return success
 
     # =====================================================
     # MÉTODOS DE CONSULTA
     # =====================================================
 
     def get_agreement_by_id(self, db: Session, agreement_id: int) -> AgreementResponse:
-        # Obtiene un convenio por ID
         db_agreement = self._get_agreement_or_raise(db, agreement_id)
         return self._model_to_schema(db_agreement)
 
     def list_agreements(self, db: Session, requester_id: int) -> List[AgreementResponse]:
-        # Lista todos los convenios
-
         requester = self._get_and_validate_user(db, requester_id)
         self._validate_admin_permissions(requester, "listar todos los convenios")
-
         db_agreements = self.agreement_dao.list(db)
-        return [self._model_to_schema(agreement) for agreement in db_agreements]
+        return [self._model_to_schema(a) for a in db_agreements]
+    
+    def list_agreement_with_project(self, db: Session, agreement_id: int, requester_id: int) -> ProyectComplete:
+        requester = self._get_and_validate_user(db, requester_id)
+        self._validate_admin_permissions(requester, "listar convenios por proyecto")
+        agreement = self.get_agreement_by_id(db, agreement_id)
+        project_id = agreement.project_id    
+        project_data = self.project_service.get_complete_project(db, project_id)
+        return project_data
+
+    def list_agreements_by_creator(self, db: Session, creator_id: int, requester_id: Optional[int] = None) -> List[AgreementResponse]:
+        if requester_id is not None and creator_id != requester_id:
+            requester = self._get_and_validate_user(db, requester_id)
+            self._validate_admin_permissions(requester, "listar convenios por creador")
+
+        agreements = self.agreement_dao.list(db)
+        filtered = [a for a in agreements if a.created_by == creator_id]
+        return [self._model_to_schema(a) for a in filtered]
 
     def list_pending_agreements(self, db: Session, requester_id: int) -> List[AgreementResponse]:
-        # Lista convenios pendientes de aprobación
-
         requester = self._get_and_validate_user(db, requester_id)
         self._validate_admin_permissions(requester, "listar convenios pendientes")
-
         db_agreements = self.agreement_dao.get_by_status(db, AgreementStatus.PENDING)
-        return [self._model_to_schema(agreement) for agreement in db_agreements]
+        return [self._model_to_schema(a) for a in db_agreements]
 
     def list_user_agreements(self, db: Session, user_id: int, requester_id: int) -> List[AgreementResponse]:
-        # Lista convenios de un usuario específico
-
         requester = self._get_and_validate_user(db, requester_id)
         if requester_id != user_id:
             self._validate_admin_permissions(requester, "listar convenios de otros usuarios")
@@ -176,33 +164,15 @@ class AgreementService:
         user_agreements = [a for a in all_agreements if a.user_id == user_id]
         return [self._model_to_schema(a) for a in user_agreements]
 
-    def get_project_for_agreement(self, db: Session, agreement_id: int, requester_id: int) -> Optional[ProyectComplete]:
-        # Obtiene el proyecto asociado a un convenio
-
-        db_agreement = self._get_agreement_or_raise(db, agreement_id)
-        if not db_agreement.project_id:
-            return None
-
-        try:
-            return self.project_service.get_complete_project(db, db_agreement.project_id)
-        except ValueError:
-            return None
-
     def get_current_agreements(self, db: Session, requester_id: int) -> List[AgreementResponse]:
-        # Lista convenios vigentes (activos en la fecha actual)
-
         requester = self._get_and_validate_user(db, requester_id)
         self._validate_admin_permissions(requester, "listar convenios vigentes")
-
         agreements = self.agreement_dao.list(db)
         return [self._model_to_schema(a) for a in agreements if a.is_current()]
 
     def get_expired_agreements(self, db: Session, requester_id: int) -> List[AgreementResponse]:
-        # Lista convenios expirados
-
         requester = self._get_and_validate_user(db, requester_id)
         self._validate_admin_permissions(requester, "listar convenios expirados")
-
         agreements = self.agreement_dao.list(db)
         return [self._model_to_schema(a) for a in agreements if a.is_expired()]
 
@@ -210,22 +180,44 @@ class AgreementService:
     # MÉTODOS PRIVADOS - UTILIDADES Y VALIDACIONES
     # =====================================================
 
+    def _get_user_entity(self, db: Session, user_id: int):
+        return self._user_to_entity(self._get_and_validate_user(db, user_id))
+
     def _get_and_validate_user(self, db: Session, user_id: int):
         try:
             return self.user_service.get_user_by_id(db, user_id)
         except ValueError:
             raise ValueError(f"Usuario con ID {user_id} no encontrado")
 
+    def _validate_project_exists(self, db: Session, project_id: int):
+        try:
+            self.project_service.get_project_with_user(db, project_id)
+        except ValueError:
+            raise ValueError(f"El proyecto con ID {project_id} no existe")
+
+    def _validate_creation_roles(self, creator_entity, assigned_entity=None):
+        if creator_entity.getRole() not in [Rol.admin, Rol.exEntity]:
+            raise ValueError("Solo administradores y entidades externas pueden crear convenios.")
+        if assigned_entity:
+            self._validate_assignment_roles(creator_entity, assigned_entity)
+
+    def _validate_assignment_roles(self, assigner_entity, assigned_entity, created_by: Optional[int] = None, assigner_id: Optional[int] = None):
+        if assigner_entity.getRole() == Rol.admin:
+            if assigned_entity.getRole() != Rol.exEntity:
+                raise ValueError("Un administrador solo puede asignar una entidad externa al convenio.")
+        elif assigner_entity.getRole() == Rol.exEntity:
+            if assigned_entity.getRole() != Rol.admin:
+                raise ValueError("Una entidad externa solo puede asignar un administrador al convenio.")
+            if created_by and assigner_id and created_by != assigner_id:
+                raise ValueError("Solo la entidad externa que creó el convenio puede asignar un administrador.")
+        else:
+            raise ValueError("No tienes permisos para asignar usuarios a convenios.")
+
     def _get_agreement_or_raise(self, db: Session, agreement_id: int) -> AgreementModel:
         agreement = self.agreement_dao.get_by_id(db, agreement_id)
         if not agreement:
             raise ValueError(f"Convenio con ID {agreement_id} no encontrado")
         return agreement
-
-    def _validate_permissions(self, user) -> None:
-        user_entity = self._user_to_entity(user)
-        if user_entity.getRole() not in [Rol.admin, Rol.exEntity]:
-            raise ValueError("No tienes permisos para crear convenios. Solo administradores y entidades externas pueden crear convenios.")
 
     def _validate_admin_permissions(self, user, action: str) -> None:
         if self._user_to_entity(user).getRole() != Rol.admin:
@@ -256,9 +248,10 @@ class AgreementService:
             start_date=model.start_date,
             end_date=model.end_date,
             current=model.is_current(),
-            status=AgreementStatus(model.status),
+            created_by=model.created_by,
             user_id=model.user_id,
-            project_id=model.project_id
+            project_id=model.project_id,
+            status=AgreementStatus(model.status)
         )
 
     def _model_to_entity(self, model: AgreementModel) -> AgreementEntity:
@@ -268,12 +261,12 @@ class AgreementService:
             end_date=model.end_date,
             user_id=model.user_id,
             project_id=model.project_id,
-            status=AgreementStatus(model.status)
+            status=AgreementStatus(model.status),
+            created_by=model.created_by
         )
 
     # =====================================================
     # MÉTODOS DE NOTIFICACIÓN
-    # Las notificaciones no deberían interrumpir el flujo principal
     # =====================================================
 
     def _notify_agreement_creation(self, db: Session, user_id: int, agreement_id: int) -> None:

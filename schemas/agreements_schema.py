@@ -8,10 +8,11 @@ class Agreement(BaseModel):
     start_date: date
     end_date: date
     current: Optional[bool] = None
-    status: AgreementStatus
+    created_by: Optional[int]  # Nuevo campo agregado
     user_id: Optional[int]
     project_id: Optional[int]
-    
+    status: AgreementStatus
+
 class AgreementResponse(Agreement):
     pass
 
@@ -24,7 +25,6 @@ class AgreementUpdate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     status: Optional[AgreementStatus] = None
-    user_id: Optional[int] = None
     project_id: Optional[int] = None
 
 class AgreementApproval(BaseModel):

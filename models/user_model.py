@@ -14,6 +14,7 @@ class UserModel(BaseDBModel):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(SQLEnum(Rol, values_callable=lambda x: [e.value for e in x]), default=Rol.student.value, nullable=False)
+
     created_projects = relationship("ProjectModel", back_populates="creator")
 
     projects = relationship(
@@ -21,5 +22,6 @@ class UserModel(BaseDBModel):
         back_populates="user",
         cascade="all, delete-orphan"
     )
-    
-    agreements = relationship("AgreementModel", back_populates="user")
+
+    assigned_agreements = relationship("AgreementModel", back_populates="user", foreign_keys="[AgreementModel.user_id]")
+    created_agreements = relationship("AgreementModel", back_populates="created_by_user", foreign_keys="[AgreementModel.created_by]")
