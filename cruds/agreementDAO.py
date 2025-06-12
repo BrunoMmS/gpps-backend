@@ -3,62 +3,68 @@ from models.agreement_model import AgreementModel
 from entities.agreement_entity import AgreementEntity, AgreementStatus
 from typing import List, Optional
 
+
 class AgreementDAO:
 
-    def create(self, db: Session, agreement_entity: AgreementEntity) -> AgreementModel:
-        """Crea un nuevo convenio"""
+    def create(self, db: Session, entity: AgreementEntity) -> AgreementModel:
+        """Crea un nuevo convenio desde una entidad de dominio."""
         try:
-            db_agreement = AgreementModel(
-                start_date=agreement_entity.get_start_date,
-                end_date=agreement_entity.get_end_date,
-                status=agreement_entity.get_status.value,
-                user_id=agreement_entity.get_external_entity_id,
-                project_id=agreement_entity.get_project_id
+            model = AgreementModel(
+                start_date=entity.get_start_date,
+                end_date=entity.get_end_date,
+                status=entity.get_status.value,
+                user_id=entity.get_user_id,
+                project_id=entity.get_project_id,
             )
-            db.add(db_agreement)
+            db.add(model)
             db.commit()
-            db.refresh(db_agreement)
-            return db_agreement
+            db.refresh(model)
+            return model
         except Exception as e:
             db.rollback()
             raise ValueError(f"No se pudo crear el convenio: {e}")
 
-    def update(self, db: Session, agreement_entity: AgreementEntity) -> AgreementModel:
-        """Actualiza un convenio existente"""
+    def update(self, db: Session, entity: AgreementEntity) -> AgreementModel:
+        """Actualiza un convenio existente a partir de una entidad."""
         try:
-            agreement = db.query(AgreementModel).filter(AgreementModel.id == agreement_entity.get_id).first()
-            if not agreement:
-                raise ValueError(f"No se encontró el convenio con ID {agreement_entity.get_id}")
+            model = self.get_by_id(db, entity.get_id)
+            if not model:
+                raise ValueError(f"No se encontró el convenio con ID {entity.get_id}")
 
-            agreement.start_date = agreement_entity.get_start_date
-            agreement.end_date = agreement_entity.get_end_date
-            agreement.status = agreement_entity.get_status.value
-            agreement.user_id = agreement_entity.get_external_entity_id
-            agreement.project_id = agreement_entity.get_project_id
+            model.start_date = entity.get_start_date
+            model.end_date = entity.get_end_date
+            model.status = entity.get_status.value
+            model.user_id = entity.get_user_id
+            model.project_id = entity.get_project_id
 
             db.commit()
-            db.refresh(agreement)
-            return agreement
+            db.refresh(model)
+            return model
         except Exception as e:
             db.rollback()
-            raise ValueError(f"No se pudo actualizar el convenio con ID {agreement_entity.get_id}: {e}")
+            raise ValueError(f"No se pudo actualizar el convenio con ID {entity.get_id}: {e}")
 
-    def update_status(self, db: Session, agreement_id: int, new_status: str) -> AgreementModel | None:
-        agreement = self.get_by_id(db, agreement_id)
-        if not agreement:
-            return None
-        agreement.status = new_status
-        db.commit()
-        db.refresh(agreement)
-        return agreement
-    
-    def delete(self, db: Session, agreement_id: int) -> bool:
-        """Elimina un convenio"""
+    def update_status(self, db: Session, agreement_id: int, new_status: AgreementStatus) -> Optional[AgreementModel]:
+        """Actualiza el estado de un convenio por ID."""
         try:
-            agreement = self.get_by_id(db, agreement_id)
-            if not agreement:
+            model = self.get_by_id(db, agreement_id)
+            if not model:
+                return None
+            model.status = new_status.value
+            db.commit()
+            db.refresh(model)
+            return model
+        except Exception as e:
+            db.rollback()
+            raise ValueError(f"No se pudo actualizar el estado del convenio {agreement_id}: {e}")
+
+    def delete(self, db: Session, agreement_id: int) -> bool:
+        """Elimina un convenio por ID."""
+        try:
+            model = self.get_by_id(db, agreement_id)
+            if not model:
                 return False
-            db.delete(agreement)
+            db.delete(model)
             db.commit()
             return True
         except Exception as e:
@@ -66,50 +72,41 @@ class AgreementDAO:
             raise ValueError(f"No se pudo eliminar el convenio con ID {agreement_id}: {e}")
 
     def get_by_id(self, db: Session, agreement_id: int) -> Optional[AgreementModel]:
-        """Obtiene un convenio por ID"""
-        try:
-            return db.query(AgreementModel).filter(AgreementModel.id == agreement_id).first()
-        except Exception as e:
-            raise ValueError(f"No se pudo obtener el convenio con ID {agreement_id}: {e}")
+        """Busca un convenio por ID."""
+        return db.query(AgreementModel).filter_by(id=agreement_id).first()
 
     def list(self, db: Session) -> List[AgreementModel]:
-        """Lista todos los convenios"""
-        try:
-            return db.query(AgreementModel).all()
-        except Exception as e:
-            raise ValueError(f"No se pudieron listar los convenios: {e}")
-        
+        """Lista todos los convenios."""
+        return db.query(AgreementModel).all()
+
     def get_by_status(self, db: Session, status: AgreementStatus) -> List[AgreementModel]:
-        """Obtiene convenios por estado"""
-        try:
-            return db.query(AgreementModel).filter(AgreementModel.status == status.value).all()
-        except Exception as e:
-            raise ValueError(f"No se pudieron obtener convenios con estado '{status.name}': {e}")
+        """Lista convenios por estado."""
+        return db.query(AgreementModel).filter_by(status=status.value).all()
 
     def assign_external_representative(self, db: Session, agreement_id: int, user_id: int) -> AgreementModel:
-        """Asigna un representante externo al convenio"""
+        """Asigna un usuario externo a un convenio."""
         try:
-            agreement = self.get_by_id(db, agreement_id)
-            if not agreement:
+            model = self.get_by_id(db, agreement_id)
+            if not model:
                 raise ValueError(f"No se encontró el convenio con ID {agreement_id}")
-            agreement.user_id = user_id
+            model.user_id = user_id
             db.commit()
-            db.refresh(agreement)
-            return agreement
+            db.refresh(model)
+            return model
         except Exception as e:
             db.rollback()
-            raise ValueError(f"No se pudo asignar el representante externo con ID {user_id} al convenio {agreement_id}: {e}")
+            raise ValueError(f"No se pudo asignar el usuario {user_id} al convenio {agreement_id}: {e}")
 
     def assign_project(self, db: Session, agreement_id: int, project_id: int) -> AgreementModel:
-        """Asigna un proyecto al convenio"""
+        """Asigna un proyecto a un convenio."""
         try:
-            agreement = self.get_by_id(db, agreement_id)
-            if not agreement:
+            model = self.get_by_id(db, agreement_id)
+            if not model:
                 raise ValueError(f"No se encontró el convenio con ID {agreement_id}")
-            agreement.project_id = project_id
+            model.project_id = project_id
             db.commit()
-            db.refresh(agreement)
-            return agreement
+            db.refresh(model)
+            return model
         except Exception as e:
             db.rollback()
-            raise ValueError(f"No se pudo asignar el proyecto con ID {project_id} al convenio {agreement_id}: {e}")
+            raise ValueError(f"No se pudo asignar el proyecto {project_id} al convenio {agreement_id}: {e}")

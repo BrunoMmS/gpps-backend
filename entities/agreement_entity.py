@@ -19,7 +19,7 @@ class AgreementEntity:
         start_date: date,
         end_date: date,
         id: Optional[int] = None,
-        external_entity_id: Optional[int] = None,
+        user_id: Optional[int] = None,
         project_id: Optional[int] = None,
         status: AgreementStatus = AgreementStatus.PENDING,
     ):
@@ -27,7 +27,7 @@ class AgreementEntity:
         self._id = id
         self._start_date = start_date
         self._end_date = end_date
-        self._external_entity_id = external_entity_id
+        self.user_id = user_id    
         self._project_id = project_id
         self._status = status
 
@@ -47,8 +47,8 @@ class AgreementEntity:
         return self._end_date
 
     @property
-    def get_external_entity_id(self) -> Optional[int]:
-        return self._external_entity_id
+    def get_user_id(self) -> Optional[int]:
+        return self.user_id
 
     @property
     def get_project_id(self) -> Optional[int]:
@@ -78,18 +78,18 @@ class AgreementEntity:
         self._validate_can_be_rejected(rejected_by)
         self._status = AgreementStatus.REJECTED
 
-    def assign_external_entity(self, user: UserEntity) -> None:
-        if user.getRole() != "ExternalEntity":
-            raise ValueError("El usuario debe tener rol de entidad externa.")
-        self._external_entity_id = user.getId()
-
     def update_dates(self, new_start: date, new_end: date) -> None:
         self._validate_dates(new_start, new_end)
         self._start_date = new_start
         self._end_date = new_end
 
-    def update_status(self, new_status: AgreementStatus) -> None:
-        self._status = new_status
+    def to_expire(self) -> None:
+        if self.is_expired and self._status not in [AgreementStatus.EXPIRED]:
+            self._status = AgreementStatus.EXPIRED
+        
+    def assign_user_id(self, user: UserEntity) -> None:
+        self._validate_user(user)
+        self.user_id = user.getId()
 
     # ---------------------------
     # Métodos privados
@@ -101,13 +101,16 @@ class AgreementEntity:
             raise ValueError("La fecha de fin no puede ser anterior a hoy.")
 
     def _validate_can_be_approved(self, user: UserEntity) -> None:
-        if self._status != AgreementStatus.PENDING:
-            raise ValueError("Solo convenios pendientes pueden ser aprobados.")
-        if user.getRole() != "Administrator":
-            raise ValueError("Solo administradores pueden aprobar convenios.")
+        if self._status not in [AgreementStatus.PENDING, AgreementStatus.REJECTED]:
+            raise ValueError("Solo convenios pendientes o rechazados pueden ser aprobados.")
+        self._validate_user(user)
+
+    def _validate_user(self, user):
+        #valida que el usuario tenga rol correcto
+        if user.getRole() not in ["Administrator", "ExternalEntity"]:
+            raise ValueError("No tienes el permiso para realizar esta accion en convenios.")
 
     def _validate_can_be_rejected(self, user: UserEntity) -> None:
         if self._status != AgreementStatus.PENDING:
             raise ValueError("Solo convenios pendientes pueden ser rechazados.")
-        if user.get_role() != "Administrator":
-            raise ValueError("Solo administradores pueden rechazar convenios.")
+        self._validate_user(user)
