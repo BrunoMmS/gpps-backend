@@ -87,6 +87,13 @@ def get_all_projects_with_user(db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
+@project_router.post("/workplan/assign", response_model=WorkPlan)
+def assign_workplan_to_project(user_id: int, workplan: WorkPlanCreate, db: Session = Depends(get_db)):
+    try:
+        return project_service.add_workplan(db, user_id,workplan)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
 """
 @project_router.get("/with-creators", response_model=list[ProjectWithCreator])
 def list_projects_with_creators(db: Session = Depends(get_db)):

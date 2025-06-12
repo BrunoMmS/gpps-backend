@@ -41,9 +41,9 @@ class ProjectService:
        
         return self.project_dao.create(db, project_entity)
     
-    def add_workplan(self, db: Session,  workplan_data: WorkPlanCreate):      
-        return self.workplan_service.create_workplan(db,  workplan_data)
     
+    def add_workplan(self, db: Session, user_id: int, workplan_data: WorkPlanCreate):
+        return self.workplan_service.create_workplan(db, user_id, workplan_data)
     def list_projects(self, db: Session) -> list[ProjectModel]:
         projects = self.project_dao.list(db)
         return projects
