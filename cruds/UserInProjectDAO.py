@@ -14,3 +14,6 @@ class UserInProjectDAO:
         db.commit()
         db.refresh(db_user_in_project)
         return db_user_in_project
+    #obtener el usuario en algun proyecto sin importar el proyecto
+    def get_by_user_id(self, db: Session, user_id: int) -> UserInProjectModel | None:
+        return db.query(UserInProjectModel).filter(UserInProjectModel.user_id == user_id).first()

@@ -65,9 +65,19 @@ class ProjectService:
         if not user_to_assign:
             raise ValueError("Usuario a asignar no encontrado")
         
+        user_to_assign_entity = self.user_service.to_entity(user_to_assign)
+        
         userEntity = self.user_service.to_entity(user)
-        if userEntity.getRole() not in [Rol.exEntity, Rol.admin]:
+        if userEntity.getRole() not in [Rol.exteacher, Rol.inteacher]:
             raise ValueError("No tienes permisos para asignar usuarios a este proyecto.")
+        
+        if user_to_assign_entity.getRole() not in [Rol.student]:
+            raise ValueError("El usuario a asignar debe ser un estudiante.")
+        
+        user_in_project_dao = UserInProjectDAO()
+        existing_user_in_project = user_in_project_dao.get_by_user_id(db, user_to_assign.id)
+        if existing_user_in_project:
+            raise ValueError("El usuario ya esta asignado a un proyecto.")
         
         userToAssignEntity = self.user_service.to_entity(user_to_assign)
         projectEntity = ProjectEntity(
