@@ -15,7 +15,7 @@ class WorkPlanService:
             raise ValueError("Usuario no encontrado")
         
         userEntity = self.user_service.to_entity(user)
-        if userEntity.getRole() not in [Rol.admin, Rol.exteacher, Rol.inteacher]:
+        if userEntity.getRole() not in [Rol.admin, Rol.exteacher, Rol.inteacher, Rol.student]:
             raise ValueError("El usuario no tiene permisos para crear un plan de trabajo")
         
         return self.workplan_dao.create(db, workplan_data)
