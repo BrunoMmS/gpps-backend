@@ -53,3 +53,5 @@ Thumbs.db
 
 # Jupyter (por si usás notebooks para pruebas)
 .ipynb_checkpoints/
+
+.uploaded_files/
