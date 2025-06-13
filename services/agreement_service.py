@@ -271,7 +271,7 @@ class AgreementService:
 
     def _notify_agreement_creation(self, db: Session, user_id: int, agreement_id: int) -> None:
         try:
-            NotificationService(db).notify(user_id, f"Se ha creado un nuevo convenio con ID {agreement_id} asociado a tu cuenta.")
+            NotificationService(db).notify(user_id, f"Se ha creado un nuevo convenio asociado a tu cuenta.")
         except Exception:
             pass
 
