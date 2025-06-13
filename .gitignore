@@ -55,3 +55,4 @@ Thumbs.db
 .ipynb_checkpoints/
 
 .uploaded_files/
+uploaded_files/*
