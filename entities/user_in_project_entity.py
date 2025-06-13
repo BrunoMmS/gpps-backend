@@ -10,7 +10,7 @@ class UserInProjectEntity:
         if not isinstance(project_entity, ProjectEntity):
             raise TypeError("project_entity debe ser una instancia de ProjectEntity")
         
-        if user_entity.getRole() not in [Rol.student, Rol.teacher, Rol.teacher2]:
+        if user_entity.getRole() not in [Rol.student, Rol.inteacher, Rol.exteacher]:
             raise ValueError("No se puede asignar un usuario que no sea estudiante o profesor a un proyecto")
         self.__id = id
         self.__user_entity = user_entity
