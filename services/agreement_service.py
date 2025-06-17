@@ -61,14 +61,6 @@ class AgreementService:
         new_end = data.end_date or agreement_entity.get_end_date
         agreement_entity.update_dates(new_start, new_end)
 
-        if data.status:
-            agreement_entity.update_status(data.status)
-
-        if data.user_id:
-            user_entity = self._get_user_entity(db, data.user_id)
-            self._validate_assignment_roles(self._user_to_entity(updater), user_entity, db_agreement.created_by, updater_id)
-            agreement_entity.assign_user_id(user_entity)
-
         if data.project_id:
             self._validate_project_exists(db, data.project_id)
 

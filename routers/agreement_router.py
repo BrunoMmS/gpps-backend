@@ -98,14 +98,14 @@ def list_agreement_with_project(agreement_id: int, requester_id: int, db: Sessio
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
-@agreement_router.get("/current", response_model=List[AgreementResponse])
+@agreement_router.get("/current/{requester_id}", response_model=List[AgreementResponse])
 def get_current_agreements(requester_id: int, db: Session = Depends(get_db)):
     try:
         return agreement_service.get_current_agreements(db, requester_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
-@agreement_router.get("/expired", response_model=List[AgreementResponse])
+@agreement_router.get("/expired/{requester_id}", response_model=List[AgreementResponse])
 def get_expired_agreements(requester_id: int, db: Session = Depends(get_db)):
     try:
         return agreement_service.get_expired_agreements(db, requester_id)
