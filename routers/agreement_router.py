@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from schemas.agreements_schema import AgreementCreate, AgreementUpdate, AgreementResponse
+from schemas.agreements_schema import AgreementCreate, AgreementUpdate, AgreementResponse, AgreementWithUser
 from schemas.project_schema import ProyectComplete
 from services.agreement_service import AgreementService
 from db.db import SessionLocal
@@ -118,3 +118,12 @@ def assign_project_to_agreement(agreement_id: int, project_id: int, assigner_id:
         return agreement_service.assign_project_to_agreement(db, agreement_id, project_id, assigner_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+@agreement_router.get("/with-user/{user_id}", response_model=list[AgreementWithUser])
+def get_agreement_with_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        return agreement_service.get_all_agreements_with_user(db, user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")

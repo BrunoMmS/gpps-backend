@@ -1,10 +1,13 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from cruds.UserDAO import UserDAO
 from cruds.agreementDAO import AgreementDAO
 from entities.agreement_entity import AgreementEntity, AgreementStatus
-from schemas.agreements_schema import AgreementCreate, AgreementUpdate, AgreementResponse
+from entities.user_entity import UserEntity
+from schemas.agreements_schema import AgreementCreate, AgreementUpdate, AgreementResponse, AgreementWithUser
 from schemas.project_schema import ProyectComplete
 from models.agreement_model import AgreementModel
+from schemas.user_schema import User
 from services.user_service import UserService
 from services.project_service import ProjectService
 from roles.rol import Rol
@@ -212,8 +215,8 @@ class AgreementService:
         return agreement
 
     def _validate_admin_permissions(self, user, action: str) -> None:
-        if self._user_to_entity(user).getRole() != Rol.admin:
-            raise ValueError(f"No tienes permisos para {action}. Solo administradores pueden realizar esta acción.")
+        if self._user_to_entity(user).getRole() not in [Rol.admin, Rol.exEntity]:
+            raise ValueError(f"No tienes permisos para {action}.")
 
     def _change_agreement_status(self, db: Session, agreement_id: int, user_entity, action: str) -> AgreementResponse:
         db_agreement = self._get_agreement_or_raise(db, agreement_id)
@@ -245,6 +248,25 @@ class AgreementService:
             project_id=model.project_id,
             status=AgreementStatus(model.status)
         )
+    
+    def _model_toschema_with_user(self, model: AgreementModel) -> List[AgreementWithUser]:
+        user_entity: UserEntity = self.user_service.get_user_by_id(model.user_id) if model.user_id else None
+        user_schema = User(user_entity.getId(), 
+                           user_entity.getUsername(), 
+                           user_entity.getLastname(), 
+                           user_entity.getEmail(), 
+                           user_entity.getRole()) if user_entity else None
+
+        return AgreementWithUser(
+            id=model.id,
+            start_date=model.start_date,
+            end_date=model.end_date,
+            current=model.is_current(),
+            created_by=model.created_by,
+            user_id=user_schema,
+            project_id=model.project_id,
+            status=AgreementStatus(model.status)
+        )
 
     def _model_to_entity(self, model: AgreementModel) -> AgreementEntity:
         return AgreementEntity(
@@ -256,7 +278,50 @@ class AgreementService:
             status=AgreementStatus(model.status),
             created_by=model.created_by
         )
+    
+    
+    def get_all_agreements_with_user(self, db: Session, user_id: int) -> List[AgreementWithUser]:
+        user = UserDAO().get_by_id(db, user_id)
+        user_schema: User = User(id=user.id, username=user.username, lastname=user.lastname, email=user.email, role=user.role)
 
+        agreements: List[AgreementModel] = self.agreement_dao.list(db)
+        agreements_schemas: List[AgreementWithUser]  = []
+
+        for agreement in agreements:
+            if agreement.created_by == user_schema.id:
+                agreements_schemas.append(AgreementWithUser(
+                    agreement.id,
+                    agreement.start_date,
+                    agreement.end_date,
+                    user_schema,
+                    user_schema,
+                    agreement.project_id,
+                    agreement.status
+                ))
+        return agreements_schemas
+        
+            
+    def get_all_agreements_with_user2(self, db: Session, user_id: int) -> List[AgreementWithUser]:
+        user = self.user_service.get_user_by_id(db, user_id)
+        agreements: List[AgreementModel] = self.agreement_dao.list(db)
+        agreements_schemas: List[AgreementWithUser]  = []
+ 
+        for agreement in agreements:
+            agreements_schemas.append(AgreementWithUser(
+            id=agreement.id,
+            start_date=agreement.start_date,
+            end_date=agreement.end_date,
+            created_by=agreement.created_by,
+            user_id=User(
+                id=user.id,
+                username=user.username,
+                lastname=user.lastname,
+                email=user.email,
+                role=user.role
+            ) if user else None,
+            project_id=agreement.project_id,
+            status=AgreementStatus(agreement.status)
+        ))
     # =====================================================
     # MÉTODOS DE NOTIFICACIÓN
     # =====================================================

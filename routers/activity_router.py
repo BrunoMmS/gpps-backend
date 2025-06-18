@@ -5,9 +5,11 @@ from db.db import SessionLocal
 from schemas.activity_schema import ActivitieCreate, Activitie
 from schemas.task_schema import TaskCreate
 from services.activity_service import ActivityService
+from services.task_service import TaskService
 
 activity_router = APIRouter(prefix="/activity", tags=["activity"])
-activity_service = ActivityService()
+activity_service:ActivityService = ActivityService()
+task_service:TaskService = TaskService()
 
 def get_db():
     db = SessionLocal()
@@ -49,3 +51,15 @@ def get_activities_by_workplan(
     db: Session = Depends(get_db)
 ):
     return activity_service.get_activities_by_workplan(db, workplan_id)
+
+
+@activity_router.put("/activities/task/{id_task}", response_model=dict)
+def set_done_task(
+    id_task: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        isChanged = task_service.set_done(db, id_task)
+        return {"detail": "Tarea marcada como completada", "task": isChanged}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
