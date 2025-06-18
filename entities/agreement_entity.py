@@ -2,6 +2,7 @@ from datetime import date
 from enum import Enum
 from typing import Optional
 from entities.user_entity import UserEntity
+from roles.rol import Rol
 
 class AgreementStatus(str, Enum):
     """Estados posibles de un convenio"""
@@ -111,9 +112,9 @@ class AgreementEntity:
             raise ValueError("Solo convenios pendientes o rechazados pueden ser aprobados.")
         self._validate_user(user)
 
-    def _validate_user(self, user):
+    def _validate_user(self, user: UserEntity) -> None:
         # valida que el usuario tenga rol correcto
-        if user.getRole() not in ["Administrator", "ExternalEntity"]:
+        if user.getRole() not in [Rol.admin, Rol.exEntity]:
             raise ValueError("No tienes el permiso para realizar esta accion en convenios.")
 
     def _validate_can_be_rejected(self, user: UserEntity) -> None:
