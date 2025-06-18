@@ -220,8 +220,8 @@ class AgreementService:
         return agreement
 
     def _validate_admin_permissions(self, user, action: str) -> None:
-        if self._user_to_entity(user).getRole() != Rol.admin:
-            raise ValueError(f"No tienes permisos para {action}. Solo administradores pueden realizar esta acción.")
+        if self._user_to_entity(user).getRole() not in [Rol.admin, Rol.exEntity]:
+            raise ValueError(f"No tienes permisos para {action}.")
 
     def _change_agreement_status(self, db: Session, agreement_id: int, user_entity, action: str) -> AgreementResponse:
         db_agreement = self._get_agreement_or_raise(db, agreement_id)
