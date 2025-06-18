@@ -119,11 +119,11 @@ def assign_project_to_agreement(agreement_id: int, project_id: int, assigner_id:
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
-@agreement_router.get("/with-user/{user_id}", response_model=AgreementWithUser)
+@agreement_router.get("/with-user/{user_id}", response_model=list[AgreementWithUser])
 def get_agreement_with_user(user_id: int, db: Session = Depends(get_db)):
-   # try:
+    try:
         return agreement_service.get_all_agreements_with_user(db, user_id)
-    #except ValueError as e:
+    except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-   # except Exception:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")

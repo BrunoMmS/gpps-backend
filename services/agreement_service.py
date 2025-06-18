@@ -1,5 +1,6 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from cruds.UserDAO import UserDAO
 from cruds.agreementDAO import AgreementDAO
 from entities.agreement_entity import AgreementEntity, AgreementStatus
 from entities.user_entity import UserEntity
@@ -288,6 +289,27 @@ class AgreementService:
     
     
     def get_all_agreements_with_user(self, db: Session, user_id: int) -> List[AgreementWithUser]:
+        user = UserDAO().get_by_id(db, user_id)
+        user_schema: User = User(id=user.id, username=user.username, lastname=user.lastname, email=user.email, role=user.role)
+
+        agreements: List[AgreementModel] = self.agreement_dao.list(db)
+        agreements_schemas: List[AgreementWithUser]  = []
+
+        for agreement in agreements:
+            if agreement.created_by == user_schema.id:
+                agreements_schemas.append(AgreementWithUser(
+                    agreement.id,
+                    agreement.start_date,
+                    agreement.end_date,
+                    user_schema,
+                    user_schema,
+                    agreement.project_id,
+                    agreement.status
+                ))
+        return agreements_schemas
+        
+            
+    def get_all_agreements_with_user2(self, db: Session, user_id: int) -> List[AgreementWithUser]:
         user = self.user_service.get_user_by_id(db, user_id)
         agreements: List[AgreementModel] = self.agreement_dao.list(db)
         agreements_schemas: List[AgreementWithUser]  = []
@@ -308,7 +330,6 @@ class AgreementService:
             project_id=agreement.project_id,
             status=AgreementStatus(agreement.status)
         ))
-
     # =====================================================
     # MÉTODOS DE NOTIFICACIÓN
     # =====================================================
