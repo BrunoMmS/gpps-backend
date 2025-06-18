@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
-from entities.agreement_entity import AgreementStatus  # Enum definido
+from entities.agreement_entity import AgreementStatus 
+from schemas.user_schema import User # Enum definido
 
 class Agreement(BaseModel):
     id: int
@@ -28,4 +29,13 @@ class AgreementUpdate(BaseModel):
     project_id: Optional[int] = None
 
 class AgreementApproval(BaseModel):
+    status: AgreementStatus
+
+class AgreementWithUser(BaseModel):
+    id: int
+    start_date: date
+    end_date: date
+    created_by: Optional[User]  # Nuevo campo agregado
+    user_id: Optional[User]
+    project_id: Optional[int]
     status: AgreementStatus

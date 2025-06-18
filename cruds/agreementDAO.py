@@ -3,6 +3,7 @@ from models.agreement_model import AgreementModel
 from entities.agreement_entity import AgreementEntity, AgreementStatus
 from typing import List, Optional
 
+
 class AgreementDAO:
 
     def create(self, db: Session, entity: AgreementEntity) -> AgreementModel:
