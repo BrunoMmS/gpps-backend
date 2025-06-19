@@ -17,7 +17,7 @@ class ProjectEntity:
     def assignUserCreate(self, user: UserEntity) -> None:
         if not isinstance(user, UserEntity):
             raise TypeError("Debe ser un usuario")
-        if user.getRole() not in [Rol.student, Rol.exEntity]:
+        if user.getRole() not in [Rol.student, Rol.exEntity, Rol.admin]:
             raise ValueError("No tienes permisos para crear un proyecto.")
         self.__user = user
 
