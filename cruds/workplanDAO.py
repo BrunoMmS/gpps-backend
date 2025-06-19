@@ -12,3 +12,6 @@ class WorkPlanDAO:
         db.commit()
         db.refresh(db_workplan)
         return db_workplan
+    
+    def find_by_project_id(self, db: Session, project_id: int) -> list[WorkPlan]:
+        return db.query(WorkPlan).filter(WorkPlan.project_id == project_id).all()
