@@ -68,7 +68,7 @@ class ProjectService:
         user_to_assign_entity = self.user_service.to_entity(user_to_assign)
         
         userEntity = self.user_service.to_entity(user)
-        if userEntity.getRole() not in [Rol.exteacher, Rol.inteacher]:
+        if userEntity.getRole() not in [Rol.exteacher, Rol.inteacher, Rol.student]:
             raise ValueError("No tienes permisos para asignar usuarios a este proyecto.")
         
         if user_to_assign_entity.getRole() not in [Rol.student]:
